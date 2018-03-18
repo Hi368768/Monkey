@@ -40,7 +40,7 @@ static const int MIN_PEER_PROTO_VERSION_143 = 70050;
 
 //
 static const int SOFT_FORK_VERSION_140 = 15999;
-static const int SOFT_FORK_VERSION_143 = 75000;
+static const int SOFT_FORK_VERSION_143 = 65000;
 
 // nTime field added to CAddress, starting with this version;
 // if possible, avoid requesting addresses nodes older than this
