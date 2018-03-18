@@ -27,7 +27,7 @@ class CInv;
 class CRequestTracker;
 class CNode;
 
-static const int LAST_POW_BLOCK = 100000;
+static const int LAST_POW_BLOCK = 65000;
 
 static const unsigned int MAX_BLOCK_SIZE = 1000000;
 static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE/2;
@@ -36,7 +36,7 @@ static const unsigned int MAX_ORPHAN_TRANSACTIONS = MAX_BLOCK_SIZE/100;
 static const unsigned int MAX_INV_SZ = 50000;
 static const int64_t MIN_TX_FEE = 1000;
 static const int64_t MIN_RELAY_TX_FEE = MIN_TX_FEE;
-static const int64_t MAX_MONEY = 100000000 * COIN;
+static const int64_t MAX_MONEY = 21000000 * COIN;
 static const int64_t COIN_YEAR_REWARD = 0 * CENT; // 0% per year
 static const int64_t MAX_MINT_PROOF_OF_STAKE = 0 * COIN;
 static const int MODIFIER_INTERVAL_SWITCH = 1;
@@ -56,6 +56,14 @@ static const uint256 hashGenesisBlockTestNet("0x00000faeefd0e5c19a761b91689dc00e
 inline int64_t PastDrift(int64_t nTime)   { return nTime - 10 * 60; } // up to 10 minutes from the past
 inline int64_t FutureDrift(int64_t nTime) { return nTime + 10 * 60; } // up to 10 minutes from the future
 
+inline unsigned int GetTargetSpacing(int nHeight) {
+    // Starting at block 75k we lower the avergage block time to 2 minutes.
+    if (nHeight >= SOFT_FORK_VERSION_143)
+        return 2 * 60;
+
+    // defaults to 3 minutes.
+    return 3 * 60;
+}
 
 extern libzerocoin::Params* ZCParams;
 extern CScript COINBASE_FLAGS;

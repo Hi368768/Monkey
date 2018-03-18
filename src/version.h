@@ -30,15 +30,17 @@ static const int DATABASE_VERSION = 70508;
 // network protocol versioning
 //
 
-static const int PROTOCOL_VERSION = 70040;
+static const int PROTOCOL_VERSION = 70050;
 
 // earlier versions not supported as of Feb 2012, and are disconnected
 static const int MIN_PROTO_VERSION = 209;
 static const int MIN_PEER_PROTO_VERSION = 70030;
 static const int MIN_PEER_PROTO_VERSION_140 = 70040;
+static const int MIN_PEER_PROTO_VERSION_143 = 70050;
 
 //
 static const int SOFT_FORK_VERSION_140 = 15999;
+static const int SOFT_FORK_VERSION_143 = 65000;
 
 // nTime field added to CAddress, starting with this version;
 // if possible, avoid requesting addresses nodes older than this

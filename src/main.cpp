@@ -40,7 +40,6 @@ CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // "standard" scrypt target limit
 CBigNum bnProofOfStakeLimit(~uint256(0) >> 20);
 CBigNum bnProofOfWorkLimitTestNet(~uint256(0) >> 16);
 
-unsigned int nTargetSpacing = 3 * 60; 	// 3 mins
 unsigned int nStakeMinAge = 8 * 60 * 60; 	// 8 hours
 unsigned int nStakeMaxAge = 2 * 24 * 60 * 60;    // 48 hours
 unsigned int nModifierInterval = 10 * 60; // time to elapse before new modifier is computed
@@ -984,16 +983,18 @@ const int DAILY_BLOCKCOUNT =  480;
 // miner's coin stake reward based on coin age spent (coin-days)
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
 {
+    int64_t nSubsidy;
+    int lastDigit = pindexBest->nHeight % 10;
+
     if (fTestNet) {
-        int lastDigit = pindexBest->nHeight % 10;
-        nRewardCoinYear = 365 * CENT;
+        nSubsidy = 13.5 * COIN;
 
-        if (lastDigit == 1) // SUPERBLOCK
-            nRewardCoinYear = 1850 * CENT;
-        else if (lastDigit == 5 || lastDigit == 8) // ULTRABLOCKS
-            nRewardCoinYear = 730 * CENT;
+        if (lastDigit == 1) // ULTRABLOCK
+            nSubsidy = 20 * COIN;
+        else if (lastDigit == 5 || lastDigit == 8) // SUPERBLOCK
+            nSubsidy = 17 * COIN;
 
-        printf("GetProofOfStakeReward(): nHeight=%d nBestHeight=%d lastDigit=%d nRewardCoinYear=%" PRId64 " nCoinAge=%" PRId64 "\n", pindexBest->nHeight, nBestHeight, lastDigit, nRewardCoinYear/CENT, nCoinAge);
+        printf("GetProofOfStakeReward(): nHeight=%d nBestHeight=%d lastDigit=%d nSubsidy=%" PRId64 "\n", pindexBest->nHeight, nBestHeight, lastDigit, nSubsidy);
 
     } else {
         // Main net
@@ -1015,21 +1016,45 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
         {
             nRewardCoinYear = ((pindexBest->nHeight <= 10501) ? 1850 * CENT : 365 * CENT);
         }
-        else {
-            int lastDigit = pindexBest->nHeight % 10;
+        else if (pindexBest->nHeight <= 65000)
+        {
             nRewardCoinYear = 365 * CENT;
 
-            if (lastDigit == 1) // SUPERBLOCK
+            if (lastDigit == 1) // ULTRABLOCK
                 nRewardCoinYear = 1850 * CENT;
-            else if (lastDigit == 5 || lastDigit == 8) // ULTRABLOCKS
+            else if (lastDigit == 5 || lastDigit == 8) // SUPERBLOCK
                 nRewardCoinYear = 730 * CENT;
+        }
+        else
+        {
+            nSubsidy = 13.5 * COIN;
+
+            if (lastDigit == 1) // ULTRABLOCK
+                nSubsidy = 20 * COIN;
+            else if (lastDigit == 5 || lastDigit == 8) // SUPERBLOCK
+                nSubsidy = 17 * COIN;
+
+            // reduce coin production by ~20% each 100k blocks, up to 60%.
+            for (int i = 100000; i <= pindexBest->nHeight; i += 100000) {
+                // up to 60% (300,000 blocks)
+                if (i > 300000)
+                    break;
+                nSubsidy -= nSubsidy*0.2;
+            }
         }
     }
 
-    int64_t nSubsidy = nCoinAge * (nRewardCoinYear / CENT / 100) / 365;
+    if (pindexBest->nHeight <= 65000 && !fTestNet) {
+        nSubsidy = nCoinAge * (nRewardCoinYear / CENT / 100) / 365;
 
-	if (pindexBest->nHeight <= 4500 && !fTestNet) {
-        nSubsidy = nCoinAge * nRewardCoinYear / 365 / COIN;
+        if (pindexBest->nHeight <= 4500) {
+            nSubsidy = nCoinAge * nRewardCoinYear / 365 / COIN;
+        }
+    }
+
+    // Force coin cap - return only fees
+    if (pindexBest->nMoneySupply >= MAX_MONEY) {
+        return nFees;
     }
 
     if (fDebug && GetBoolArg("-printcreation"))
@@ -1098,6 +1123,7 @@ static unsigned int GetNextTargetRequired_(const CBlockIndex* pindexLast, bool f
     if (pindexPrevPrev->pprev == NULL)
         return bnTargetLimit.GetCompact(); // second block
 
+    int64_t nTargetSpacing = GetTargetSpacing(pindexLast->nHeight);
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
     if (nActualSpacing < 0)
         nActualSpacing = nTargetSpacing;
@@ -2892,7 +2918,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         uint64_t nNonce = 1;
         vRecv >> pfrom->nVersion >> pfrom->nServices >> nTime >> addrMe;
         if (pfrom->nVersion < MIN_PEER_PROTO_VERSION ||
-            (nBestHeight > SOFT_FORK_VERSION_140 && pfrom->nVersion < MIN_PEER_PROTO_VERSION_140))
+            (nBestHeight > SOFT_FORK_VERSION_140 && pfrom->nVersion < MIN_PEER_PROTO_VERSION_140) ||
+            (nBestHeight >= SOFT_FORK_VERSION_143 && pfrom->nVersion < MIN_PEER_PROTO_VERSION_143) )
         {
             // Since February 20, 2012, the protocol is initiated at version 209,
             // and earlier versions are no longer supported
