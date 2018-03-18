@@ -40,7 +40,6 @@ CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // "standard" scrypt target limit
 CBigNum bnProofOfStakeLimit(~uint256(0) >> 20);
 CBigNum bnProofOfWorkLimitTestNet(~uint256(0) >> 16);
 
-unsigned int nTargetSpacing = 3 * 60; 	// 3 mins
 unsigned int nStakeMinAge = 8 * 60 * 60; 	// 8 hours
 unsigned int nStakeMaxAge = 2 * 24 * 60 * 60;    // 48 hours
 unsigned int nModifierInterval = 10 * 60; // time to elapse before new modifier is computed
@@ -1098,6 +1097,7 @@ static unsigned int GetNextTargetRequired_(const CBlockIndex* pindexLast, bool f
     if (pindexPrevPrev->pprev == NULL)
         return bnTargetLimit.GetCompact(); // second block
 
+    int64_t nTargetSpacing = GetTargetSpacing(pindexLast->nHeight);
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
     if (nActualSpacing < 0)
         nActualSpacing = nTargetSpacing;

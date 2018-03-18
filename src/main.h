@@ -56,6 +56,14 @@ static const uint256 hashGenesisBlockTestNet("0x00000faeefd0e5c19a761b91689dc00e
 inline int64_t PastDrift(int64_t nTime)   { return nTime - 10 * 60; } // up to 10 minutes from the past
 inline int64_t FutureDrift(int64_t nTime) { return nTime + 10 * 60; } // up to 10 minutes from the future
 
+inline unsigned int GetTargetSpacing(int nHeight) {
+    // Starting at block 75k we lower the avergage block time to 2 minutes.
+    if (nHeight >= SOFT_FORK_VERSION_143)
+        return 2 * 60;
+
+    // defaults to 3 minutes.
+    return 3 * 60;
+}
 
 extern libzerocoin::Params* ZCParams;
 extern CScript COINBASE_FLAGS;
