@@ -2892,7 +2892,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         uint64_t nNonce = 1;
         vRecv >> pfrom->nVersion >> pfrom->nServices >> nTime >> addrMe;
         if (pfrom->nVersion < MIN_PEER_PROTO_VERSION ||
-            (nBestHeight > SOFT_FORK_VERSION_140 && pfrom->nVersion < MIN_PEER_PROTO_VERSION_140))
+            (nBestHeight > SOFT_FORK_VERSION_140 && pfrom->nVersion < MIN_PEER_PROTO_VERSION_140) ||
+            (nBestHeight >= SOFT_FORK_VERSION_143 && pfrom->nVersion < MIN_PEER_PROTO_VERSION_143) )
         {
             // Since February 20, 2012, the protocol is initiated at version 209,
             // and earlier versions are no longer supported
