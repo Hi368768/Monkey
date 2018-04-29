@@ -8,14 +8,14 @@
 #include "csvmodelwriter.h"
 #include "guiutil.h"
 
+#ifdef USE_QRCODE
+#include "qrcodedialog.h"
+#endif
+
 #include <QSortFilterProxyModel>
 #include <QClipboard>
 #include <QMessageBox>
 #include <QMenu>
-
-#ifdef USE_QRCODE
-#include "qrcodedialog.h"
-#endif
 
 AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     QDialog(parent),
@@ -36,6 +36,8 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
 #ifndef USE_QRCODE
     ui->showQRCode->setVisible(false);
 #endif
+
+    ui->tableView->setShowGrid(false);
 
     switch(mode)
     {
@@ -78,9 +80,7 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     if(tab == SendingTab)
         contextMenu->addAction(deleteAction);
     contextMenu->addSeparator();
-#ifdef USE_QRCODE
     contextMenu->addAction(showQRCodeAction);
-#endif
     if(tab == ReceivingTab)
         contextMenu->addAction(signMessageAction);
     else if(tab == SendingTab)
@@ -186,31 +186,36 @@ void AddressBookPage::on_signMessage_clicked()
 {
     QTableView *table = ui->tableView;
     QModelIndexList indexes = table->selectionModel()->selectedRows(AddressTableModel::Address);
+    QString addr;
 
     foreach (QModelIndex index, indexes)
     {
-        QString address = index.data().toString();
-        emit signMessage(address);
+        QVariant address = index.data();
+        addr = address.toString();
     }
+
+    emit signMessage(addr);
 }
 
 void AddressBookPage::on_verifyMessage_clicked()
 {
     QTableView *table = ui->tableView;
     QModelIndexList indexes = table->selectionModel()->selectedRows(AddressTableModel::Address);
+    QString addr;
 
     foreach (QModelIndex index, indexes)
     {
-        QString address = index.data().toString();
-        emit verifyMessage(address);
+        QVariant address = index.data();
+        addr = address.toString();
     }
+
+    emit verifyMessage(addr);
 }
 
 void AddressBookPage::on_newAddressButton_clicked()
 {
     if(!model)
         return;
-
     EditAddressDialog dlg(
             tab == SendingTab ?
             EditAddressDialog::NewSendingAddress :
@@ -227,7 +232,6 @@ void AddressBookPage::on_deleteButton_clicked()
     QTableView *table = ui->tableView;
     if(!table->selectionModel())
         return;
-
     QModelIndexList indexes = table->selectionModel()->selectedRows();
     if(!indexes.isEmpty())
     {
@@ -339,11 +343,11 @@ void AddressBookPage::on_showQRCode_clicked()
 
     foreach (QModelIndex index, indexes)
     {
-        QString address = index.data().toString();
-        QString label = index.sibling(index.row(), 0).data(Qt::EditRole).toString();
+        QString address = index.data().toString(), label = index.sibling(index.row(), 0).data(Qt::EditRole).toString();
 
         QRCodeDialog *dialog = new QRCodeDialog(address, label, tab == ReceivingTab, this);
-        dialog->setModel(optionsModel);
+        if(optionsModel)
+            dialog->setModel(optionsModel);
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->show();
     }

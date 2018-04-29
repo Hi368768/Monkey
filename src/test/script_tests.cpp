@@ -79,7 +79,7 @@ ParseScript(string s)
         {
             BOOST_ERROR("Parse error: " << s);
             return CScript();
-        }                        
+        }
     }
 
     return result;
@@ -98,7 +98,7 @@ read_json(const std::string& filename)
     }
 #endif
 
-    ifstream ifs(testFile.string().c_str(), ifstream::in);
+    ifstream ifs(testFile.string(), ifstream::in);
     Value v;
     if (!read_stream(ifs, v))
     {
@@ -326,7 +326,7 @@ BOOST_AUTO_TEST_CASE(script_CHECKMULTISIG23)
     keys.clear(); // Must have signatures
     CScript badsig6 = sign_multisig(scriptPubKey23, keys, txTo23);
     BOOST_CHECK(!VerifyScript(badsig6, scriptPubKey23, txTo23, 0, true, 0));
-}    
+}
 
 BOOST_AUTO_TEST_CASE(script_combineSigs)
 {

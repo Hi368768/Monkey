@@ -15,9 +15,11 @@
 #include <QMessageBox>
 #include <QTextCodec>
 #include <QLocale>
+#include <QTimer>
 #include <QTranslator>
 #include <QSplashScreen>
 #include <QLibraryInfo>
+#include <QFontDatabase>
 
 #if defined(BITCOIN_NEED_QT_PLUGINS) && !defined(_BITCOIN_QT_PLUGINS_INCLUDED)
 #define _BITCOIN_QT_PLUGINS_INCLUDED
@@ -34,22 +36,23 @@ Q_IMPORT_PLUGIN(qtaccessiblewidgets)
 static BitcoinGUI *guiref;
 static QSplashScreen *splashref;
 
-static void ThreadSafeMessageBox(const std::string& message, const std::string& caption, int style)
+static void ThreadSafeMessageBox(const std::string& message, const std::string& caption, unsigned int style)
 {
     // Message from network thread
     if(guiref)
     {
         bool modal = (style & CClientUIInterface::MODAL);
-        // in case of modal message, use blocking connection to wait for user to click OK
-        QMetaObject::invokeMethod(guiref, "error",
+        // In case of modal message, use blocking connection to wait for user to click a button
+        QMetaObject::invokeMethod(guiref, "message",
                                    modal ? GUIUtil::blockingGUIThreadConnection() : Qt::QueuedConnection,
                                    Q_ARG(QString, QString::fromStdString(caption)),
                                    Q_ARG(QString, QString::fromStdString(message)),
-                                   Q_ARG(bool, modal));
+                                   Q_ARG(bool, modal),
+                                   Q_ARG(unsigned int, style));
     }
     else
     {
-        printf("%s: %s\n", caption.c_str(), message.c_str());
+        LogPrintf("%s: %s\n", caption, message);
         fprintf(stderr, "%s: %s\n", caption.c_str(), message.c_str());
     }
 }
@@ -58,7 +61,7 @@ static bool ThreadSafeAskFee(int64_t nFeeRequired, const std::string& strCaption
 {
     if(!guiref)
         return false;
-    if(nFeeRequired < MIN_TX_FEE || nFeeRequired <= nTransactionFee || fDaemon)
+    if(nFeeRequired < MIN_TX_FEE || nFeeRequired <= nTransactionFee)
         return true;
     bool payFee = false;
 
@@ -82,14 +85,10 @@ static void InitMessage(const std::string &message)
 {
     if(splashref)
     {
-        splashref->showMessage(QString::fromStdString(message), Qt::AlignBottom|Qt::AlignHCenter, QColor(51,51,51));
+        splashref->showMessage(QString::fromStdString(message), Qt::AlignBottom|Qt::AlignHCenter, QColor(255, 255, 255));
         QApplication::instance()->processEvents();
     }
-}
-
-static void QueueShutdown()
-{
-    QMetaObject::invokeMethod(QCoreApplication::instance(), "quit", Qt::QueuedConnection);
+    LogPrintf("init message: %s\n", message);
 }
 
 /*
@@ -109,9 +108,18 @@ static void handleRunawayException(std::exception *e)
     exit(1);
 }
 
+/* qDebug() message handler --> debug.log */
+void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString &msg)
+{
+    const char *category = (type == QtDebugMsg) ? "qt" : NULL;
+    LogPrint(category, "GUI: %s\n", msg.toStdString());
+}
+
 #ifndef BITCOIN_QT_TEST
 int main(int argc, char *argv[])
 {
+    // Command-line options take precedence:
+    ParseParameters(argc, argv);
 
 #if QT_VERSION < 0x050000
     // Internal string conversion is all UTF-8
@@ -124,6 +132,8 @@ int main(int argc, char *argv[])
 
     // Install global event filter that makes sure that long tooltips can be word-wrapped
     app.installEventFilter(new GUIUtil::ToolTipToRichTextFilter(TOOLTIP_WRAP_THRESHOLD, &app));
+    // Install qDebug() message handler to route to debug.log
+    qInstallMessageHandler(DebugMessageHandler);
 
     // Command-line options take precedence:
     ParseParameters(argc, argv);
@@ -143,7 +153,7 @@ int main(int argc, char *argv[])
     // as it is used to locate QSettings)
     app.setOrganizationName("monkey");
     //XXX app.setOrganizationDomain("");
-    if(GetBoolArg("-testnet")) // Separate UI settings for testnet
+    if(GetBoolArg("-testnet", false)) // Separate UI settings for testnet
         app.setApplicationName("monkey-Qt-testnet");
     else
         app.setApplicationName("monkey-Qt");
@@ -183,7 +193,6 @@ int main(int argc, char *argv[])
     uiInterface.ThreadSafeAskFee.connect(ThreadSafeAskFee);
     uiInterface.ThreadSafeHandleURI.connect(ThreadSafeHandleURI);
     uiInterface.InitMessage.connect(InitMessage);
-    uiInterface.QueueShutdown.connect(QueueShutdown);
     uiInterface.Translate.connect(Translate);
 
     // Show help message immediately after parsing command-line options (for "-lang") and setting locale,
@@ -196,7 +205,7 @@ int main(int argc, char *argv[])
     }
 
     QSplashScreen splash(QPixmap(":/images/splash"), 0);
-    if (GetBoolArg("-splash", true) && !GetBoolArg("-min"))
+    if (GetBoolArg("-splash", true) && !GetBoolArg("-min", false))
     {
         splash.show();
         splashref = &splash;
@@ -208,19 +217,37 @@ int main(int argc, char *argv[])
 
     try
     {
+        int nFontId = QFontDatabase::addApplicationFont(":/fonts/lato-r");
+        if (nFontId < 0)
+            LogPrintf("Font cannot be loaded !\n");
+
+        QString family = QFontDatabase::applicationFontFamilies(nFontId).at(0);
+        LogPrintf("Font family: %s\n", family.toStdString());
+        QFont default_font(family);
+        default_font.setPointSize(14);
+        QApplication::setFont(default_font);
+
+        /* Open CSS when configured */
+        app.setStyleSheet(GUIUtil::loadStyleSheet());
+
         // Regenerate startup link, to fix links to old versions
         if (GUIUtil::GetStartOnSystemStartup())
             GUIUtil::SetStartOnSystemStartup(true);
 
+        boost::thread_group threadGroup;
+
         BitcoinGUI window;
         guiref = &window;
-        if(AppInit2())
+
+        QTimer* pollShutdownTimer = new QTimer(guiref);
+        QObject::connect(pollShutdownTimer, SIGNAL(timeout()), guiref, SLOT(detectShutdown()));
+        pollShutdownTimer->start(200);
+
+        if(AppInit2(threadGroup))
         {
             {
                 // Put this in a block, so that the Model objects are cleaned up before
                 // calling Shutdown().
-
-                optionsModel.Upgrade(); // Must be done after AppInit2
 
                 if (splashref)
                     splash.finish(&window);
@@ -232,7 +259,7 @@ int main(int argc, char *argv[])
                 window.setWalletModel(&walletModel);
 
                 // If -min option passed, start window minimized.
-                if(GetBoolArg("-min"))
+                if(GetBoolArg("-min", false))
                 {
                     window.showMinimized();
                 }
@@ -249,7 +276,9 @@ int main(int argc, char *argv[])
                 guiref = 0;
             }
             // Shutdown the core and its threads, but don't exit Bitcoin-Qt here
-            Shutdown(NULL);
+            threadGroup.interrupt_all();
+            threadGroup.join_all();
+            Shutdown();
         }
         else
         {

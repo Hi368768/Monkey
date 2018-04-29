@@ -11,15 +11,27 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleExecutable</key>
-	<string>Money-Qt</string>
+	<string>Monkey-Qt</string>
 	<key>CFBundleIdentifier</key>
 	<string>community.monkey.Monkey-Qt</string>
-  <key>CFBundleURLTypes</key>
-  <key>NSPrincipalClass</key>
-  <string>NSApplication</string>
-  <key>NSHighResolutionCapable</key>
-  <string>True</string>
-  <key>LSAppNapIsDisabled</key>
-  <string>True</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+		<key>CFBundleTypeRole</key>
+		<string>Editor</string>
+		<key>CFBundleURLName</key>
+		<string>community.monkey.Monkey-Qt</string>
+		<key>CFBundleURLSchemes</key>
+		<array>
+			<string>monkey</string>
+		</array>
+		</dict>
+	</array>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSHighResolutionCapable</key>
+	<string>True</string>
+	<key>LSAppNapIsDisabled</key>
+	<string>True</string>
 </dict>
 </plist>

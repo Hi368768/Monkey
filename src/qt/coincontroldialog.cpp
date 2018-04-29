@@ -1,14 +1,18 @@
 #include "coincontroldialog.h"
 #include "ui_coincontroldialog.h"
 
+#include "addresstablemodel.h"
+#include "bitcoinunits.h"
+#include "base58.h"
+#include "core.h"
+#include "guiutil.h"
 #include "init.h"
 #include "bitcoinunits.h"
 #include "walletmodel.h"
 #include "addresstablemodel.h"
 #include "optionsmodel.h"
 #include "coincontrol.h"
-//#include "rpcserver.h"
-#include "bitcoinrpc.h"
+#include "rpcserver.h"
 #include "guiutil.h"
 
 #include <QApplication>
@@ -24,10 +28,8 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 
-extern int64_t nRewardCoinYear;
-extern unsigned int nStakeMaxAge;
-
 using namespace std;
+
 QList<qint64> CoinControlDialog::payAmounts;
 CCoinControl* CoinControlDialog::coinControl = new CCoinControl();
 
@@ -622,7 +624,7 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
         int64_t nFee = nTransactionFee * (1 + (int64_t)nBytes / 1000);
 
         // Min Fee
-        int64_t nMinFee = txDummy.GetMinFee(1, GMF_SEND, nBytes);
+        int64_t nMinFee = txDummy.GetMinFee(nBytes, AllowFree(dPriority), GMF_SEND);
 
         nPayFee = max(nFee, nMinFee);
 
@@ -776,7 +778,7 @@ void CoinControlDialog::updateView()
             uint64_t nTxWeight;
             model->getStakeWeightFromValue(out.tx->GetTxTime(), out.tx->vout[out.i].nValue, nTxWeight);
 
-            double dStakeAge = nStakeMinAge;
+            double dStakeAge = Params().StakeMinAge();
 
             if ((GetTime() - out.tx->GetTxTime()) < dStakeAge)
                 nDisplayWeight = 0;
@@ -856,12 +858,12 @@ void CoinControlDialog::updateView()
             itemOutput->setText(COLUMN_WEIGHT, strPad(QString::number(nDisplayWeight), 8, " "));
 
             // age
-            uint64_t nAge = min((uint64_t)GetTime() - nTime, (uint64_t)nStakeMaxAge);
+            uint64_t nAge = min((uint64_t)GetTime() - nTime, (uint64_t)Params().StakeMaxAge());
             itemOutput->setText(COLUMN_AGE, QString::number((double)nAge / 86400, 'f', 2));
             itemOutput->setText(COLUMN_AGE_INT64, QString::number((double)nAge / 86400, 'f', 2));
 
             // potential stake
-            double nPotentialStake = (double)nBlockSize * (nRewardCoinYear/CENT/100) * ((double)nAge / (86400) / 365);
+            double nPotentialStake = (double)nBlockSize * (365/100) * ((double)nAge / (86400) / 365);
             itemOutput->setText(COLUMN_POTENTIALSTAKE, QString::number(nPotentialStake, 'f', 2));
             itemOutput->setText(COLUMN_POTENTIALSTAKE_INT64, strPad(QString::number((int64_t)nPotentialStake), 16, " "));
 
@@ -909,11 +911,6 @@ void CoinControlDialog::updateView()
             itemWalletAddress->setText(COLUMN_AMOUNT_INT64, strPad(QString::number(nSum), 15, " "));
             itemWalletAddress->setText(COLUMN_PRIORITY, CoinControlDialog::getPriorityLabel(dPrioritySum));
             itemWalletAddress->setText(COLUMN_PRIORITY_INT64, strPad(QString::number((int64_t)dPrioritySum), 20, " "));
-			itemWalletAddress->setText(COLUMN_POTENTIALSTAKE, BitcoinUnits::formatAge(nDisplayUnit, nPotentialStakeSum));
-            itemWalletAddress->setText(COLUMN_POTENTIALSTAKE_INT64, strPad(QString::number(nPotentialStakeSum), 20, " "));
-
-			// Tree mode weight
-            itemWalletAddress->setText(COLUMN_WEIGHT, strPad(QString::number((uint64_t)nTxWeightSum), 8, " "));
         }
     }
 

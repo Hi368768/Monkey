@@ -1,10 +1,12 @@
 #include "editaddressdialog.h"
 #include "ui_editaddressdialog.h"
+
 #include "addresstablemodel.h"
 #include "guiutil.h"
 
 #include <QDataWidgetMapper>
 #include <QMessageBox>
+#include <QClipboard>
 
 EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
     QDialog(parent),
@@ -19,6 +21,9 @@ EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
     case NewReceivingAddress:
         setWindowTitle(tr("New receiving address"));
         ui->addressEdit->setEnabled(false);
+        ui->addressEdit->setVisible(false);
+        ui->labelAddress->setVisible(false);
+        ui->EditAddressPasteButton->setVisible(false);
         break;
     case NewSendingAddress:
         setWindowTitle(tr("New sending address"));
@@ -26,6 +31,9 @@ EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
     case EditReceivingAddress:
         setWindowTitle(tr("Edit receiving address"));
         ui->addressEdit->setEnabled(false);
+        ui->addressEdit->setVisible(true);
+        ui->labelAddress->setVisible(true);
+        ui->EditAddressPasteButton->setVisible(false);
         break;
     case EditSendingAddress:
         setWindowTitle(tr("Edit sending address"));
@@ -66,10 +74,13 @@ bool EditAddressDialog::saveCurrentRow()
     {
     case NewReceivingAddress:
     case NewSendingAddress:
+	{
         address = model->addRow(
                 mode == NewSendingAddress ? AddressTableModel::Send : AddressTableModel::Receive,
                 ui->labelEdit->text(),
-                ui->addressEdit->text());
+                ui->addressEdit->text(),
+                AddressTableModel::AT_Normal);
+	}
         break;
     case EditReceivingAddress:
     case EditSendingAddress:
@@ -133,4 +144,10 @@ void EditAddressDialog::setAddress(const QString &address)
 {
     this->address = address;
     ui->addressEdit->setText(address);
+}
+
+void EditAddressDialog::on_EditAddressPasteButton_clicked()
+{
+    // Paste text from clipboard into recipient field
+    ui->addressEdit->setText(QApplication::clipboard()->text());
 }

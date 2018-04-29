@@ -3,7 +3,7 @@
 
 #include "base58.h"
 #include "util.h"
-#include "bitcoinrpc.h"
+#include "rpcserver.h"
 
 using namespace std;
 using namespace json_spirit;
@@ -53,10 +53,10 @@ BOOST_AUTO_TEST_CASE(rpc_addmultisig)
     BOOST_CHECK_THROW(addmultisig(createArgs(1, "NotAValidPubkey"), false), runtime_error);
 
     string short1(address1Hex, address1Hex+sizeof(address1Hex)-2); // last byte missing
-    BOOST_CHECK_THROW(addmultisig(createArgs(2, short1.c_str()), false), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(2, short1), false), runtime_error);
 
     string short2(address1Hex+1, address1Hex+sizeof(address1Hex)); // first byte missing
-    BOOST_CHECK_THROW(addmultisig(createArgs(2, short2.c_str()), false), runtime_error);
+    BOOST_CHECK_THROW(addmultisig(createArgs(2, short2), false), runtime_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

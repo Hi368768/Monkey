@@ -120,6 +120,8 @@ TransactionView::TransactionView(QWidget *parent) :
     view->setTabKeyNavigation(false);
     view->setContextMenuPolicy(Qt::CustomContextMenu);
 
+    view->setShowGrid(false);
+
     transactionView = view;
 
     // Actions

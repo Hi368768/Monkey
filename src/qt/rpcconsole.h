@@ -2,6 +2,7 @@
 #define RPCCONSOLE_H
 
 #include <QDialog>
+#include <QCompleter>
 
 namespace Ui {
     class RPCConsole;
@@ -37,6 +38,16 @@ private slots:
     void on_openDebugLogfileButton_clicked();
     /** display messagebox with program parameters (same as bitcoin-qt --help) */
     void on_showCLOptionsButton_clicked();
+    /** change the time range of the network traffic graph */
+    void on_sldGraphRange_valueChanged(int value);
+    /** update traffic statistics */
+    void updateTrafficStats(quint64 totalBytesIn, quint64 totalBytesOut);
+    /** clear traffic graph */
+    void on_btnClearTrafficGraph_clicked();
+    /** paste clipboard to line */
+    void on_pasteButton_clicked();
+    /** copy to clipboard */
+    void on_copyButton_clicked();
 
 public slots:
     void clear();
@@ -44,21 +55,29 @@ public slots:
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
     /** Set number of blocks shown in the UI */
-    void setNumBlocks(int count, int countOfPeers);
+    void setNumBlocks(int count);
+    /** Set number of masternodes shown in the UI */
+    void setMasternodeCount(const QString &strMasternodes);
     /** Go forward or back in history */
     void browseHistory(int offset);
     /** Scroll console view to end */
     void scrollToEnd();
+    /** Show folder with wallet backups in default browser */
+    void showBackups();
 signals:
     // For RPC command executor
     void stopExecutor();
     void cmdRequest(const QString &command);
 
 private:
+    static QString FormatBytes(quint64 bytes);
+    void setTrafficGraphRange(int mins);
+
     Ui::RPCConsole *ui;
     ClientModel *clientModel;
     QStringList history;
     int historyPtr;
+    QCompleter *autoCompleter;
 
     void startExecutor();
 };

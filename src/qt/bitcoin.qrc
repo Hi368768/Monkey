@@ -1,7 +1,9 @@
 <RCC>
+    <qresource prefix="/css">
+        <file alias="default">res/css/default.css</file>
+    </qresource>
     <qresource prefix="/fonts">
-        <file alias="ubuntu-r">res/fonts/Ubuntu-R.ttf</file>
-        <file alias="ubuntu-b">res/fonts/Ubuntu-B.ttf</file>
+        <file alias="lato-r">res/fonts/Lato-Regular.ttf</file>
     </qresource>
     <qresource prefix="/icons">
         <file alias="address-book">res/icons/address-book.png</file>
@@ -46,11 +48,15 @@
         <file alias="debugwindow">res/icons/debugwindow.png</file>
         <file alias="staking_off">res/icons/staking_off.png</file>
         <file alias="staking_on">res/icons/staking_on.png</file>
+        <file alias="masternodes">res/icons/masternodes.png</file>
+        <file alias="arrow-down">res/icons/arrow-down.png</file>
+        <file alias="arrow-up">res/icons/arrow-up.png</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>
         <file alias="splash">res/images/splash.png</file>
-		<file alias="bkg">res/images/bkg.gif</file>
+        <file alias="wallet_frame">res/images/wallet_frame.jpg</file>
+        <file alias="logo_overview">res/images/logo_overview.png</file>
     </qresource>
     <qresource prefix="/movies">
         <file alias="update_spinner">res/movies/update_spinner.mng</file>
