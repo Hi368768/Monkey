@@ -1477,7 +1477,7 @@ int64_t GetProofOfWorkReward(int nHeight, int64_t nFees)
     // hardCap v2.1
     if(pindexBest->nMoneySupply > MAX_SINGLE_TX)
     {
-        LogPrint("MINEOUT", "GetProofOfWorkReward(): create=%s nFees=%d\n", FormatMoney(nFees), nFees);
+        LogPrint("creation", "GetProofOfWorkReward(): create=%s nFees=%d\n", FormatMoney(nFees), nFees);
         return nFees;
     }
 
@@ -3869,7 +3869,14 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
 
         pfrom->fSuccessfullyConnected = true;
 
-        LogPrintf("receive version message: version %d, blocks=%d, us=%s, them=%s, peer=%s\n", pfrom->nVersion, pfrom->nStartingHeight, addrMe.ToString(), addrFrom.ToString(), pfrom->addr.ToString());
+        string remoteAddr;
+        if (fLogIPs)
+            remoteAddr = ", peeraddr=" + pfrom->addr.ToString();
+
+        LogPrintf("receive version message: %s: version %d, blocks=%d, us=%s, peer=%s%s\n",
+            pfrom->cleanSubVer, pfrom->nVersion,
+            pfrom->nStartingHeight, addrMe.ToString(), pfrom->id,
+            remoteAddr);
 
         if (GetBoolArg("-synctime", true)){
             AddTimeData(pfrom->addr, nTime);
