@@ -19,7 +19,7 @@ using namespace std;
 using namespace boost;
 
 // Don't ever reuse these IDs for other sporks
-#define SPORK_1_ENABLE_MASTERNODE_PAYMENTS                    4070908800
+#define SPORK_1_ENABLE_MASTERNODE_PAYMENTS                    10000
 #define SPORK_2_INSTANTX                                      10001
 #define SPORK_3_INSTANTX_BLOCK_FILTERING                      10002
 #define SPORK_4_NOTUSED                                       10003
