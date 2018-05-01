@@ -49,6 +49,12 @@ bool AppInit(int argc, char* argv[])
         }
         ReadConfigFile(mapArgs, mapMultiArgs);
 
+        if (mapArgs.count("-version"))
+        {
+            std::string strUsage = _("Monkey version") + " " + FormatFullVersion() + "\n";
+            return false;
+        }
+
         if (mapArgs.count("-?") || mapArgs.count("--help"))
         {
             // First part of help message is specific to bitcoind / RPC client
