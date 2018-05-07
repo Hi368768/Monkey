@@ -132,7 +132,7 @@ public:
     bool fFileBacked;
     bool fWalletUnlockAnonymizeOnly;
     std::string strWalletFile;
-    uint64_t nStakeSplitThreshold;
+    CAmount nStakeSplitThreshold;
     bool fSplitBlock;
 
     std::set<int64_t> setKeyPool;
@@ -167,7 +167,7 @@ public:
         nTimeFirstKey = 0;
         nLastFilteredHeight = 0;
         fWalletUnlockAnonymizeOnly = false;
-        nStakeSplitThreshold = 500;
+        nStakeSplitThreshold = 1000;
 	fSplitBlock = false;
     }
 
@@ -1013,6 +1013,8 @@ public:
     {
         return (GetDebit(filter) > 0);
     }
+
+    bool InMempool() const;
 
     bool IsTrusted() const
     {

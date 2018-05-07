@@ -567,7 +567,7 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
         {
             ssValue >> pwallet->nOrderPosNext;
         }
-	else if (strType == "stakeSplitThreshold")
+        else if (strType == "stakeSplitThreshold")
         {
             ssValue >> pwallet->nStakeSplitThreshold;
         }
@@ -878,4 +878,10 @@ bool CWalletDB::Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys)
 bool CWalletDB::Recover(CDBEnv& dbenv, std::string filename)
 {
     return CWalletDB::Recover(dbenv, filename, false);
+}
+
+bool CWalletDB::WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold)
+{
+    nWalletDBUpdated++;
+    return Write(std::string("stakeSplitThreshold"), nStakeSplitThreshold);
 }

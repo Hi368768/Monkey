@@ -8,6 +8,7 @@
 #include "util.h"
 
 #include <stdint.h>
+#include <fstream>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>

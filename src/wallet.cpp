@@ -8,6 +8,7 @@
 #include "base58.h"
 #include "coincontrol.h"
 #include "kernel.h"
+#include "main.h"
 #include "net.h"
 #include "util.h"
 #include "txdb.h"
@@ -30,9 +31,6 @@ using namespace std;
 int64_t nTransactionFee = MIN_TX_FEE;
 int64_t nReserveBalance = 0;
 int64_t nMinimumInputValue = 0;
-
-static int64_t GetStakeCombineThreshold() { return 500 * COIN; }
-static int64_t GetStakeSplitThreshold() { return 2 * GetStakeCombineThreshold(); }
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -1203,6 +1201,15 @@ void CWallet::ReacceptWalletTransactions()
     }
 }
 
+bool CWalletTx::InMempool() const
+{
+    LOCK(mempool.cs);
+    if (mempool.exists(GetHash())) {
+        return true;
+    }
+    return false;
+}
+
 void CWalletTx::RelayWalletTransaction(CTxDB& txdb, std::string strCommand)
 {
     if (!(IsCoinBase() || IsCoinStake()))
@@ -1549,7 +1556,7 @@ CAmount CWallet::GetImmatureWatchOnlyBalance() const
 }
 
 // populate vCoins with vector of available COutputs.
-void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const CCoinControl *coinControl, AvailableCoinsType coin_type, bool useIX) const
+void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const CCoinControl *coinControl, AvailableCoinsType coin_type, bool fUseIX) const
 {
     vCoins.clear();
 
@@ -1565,30 +1572,35 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
             if (fOnlyConfirmed && !pcoin->IsTrusted())
                 continue;
 
-            if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0)
-                continue;
-
-            if(pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() > 0)
+            if ((pcoin->IsCoinBase() || pcoin->IsCoinStake()) && pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
             int nDepth = pcoin->GetDepthInMainChain(false);
             if (nDepth <= 0) // TXNOTE: coincontrol fix / ignore 0 confirm
                 continue;
 
-            // do not use IX for inputs that have less then 6 blockchain confirmations
-            if (useIX && nDepth < 10)
+            // do not use IX for inputs that have less then 10 blockchain confirmations
+            if (fUseIX && nDepth < 10)
                 continue;
 
-            for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
+            // We should not consider coins which aren't at least in our mempool
+            // It's possible for these to be conflicted via ancestors which we may never be able to detect
+            if (nDepth == 0 && !pcoin->InMempool())
+                continue;
+
+            for (unsigned int i = 0; i < pcoin->vout.size(); i++)
+            {
                 bool found = false;
                 if(coin_type == ONLY_DENOMINATED) {
                     found = IsDenominatedAmount(pcoin->vout[i].nValue);
                 } else if(coin_type == ONLY_NOT10000IFMN) {
-                    found = !(fMasterNode && pcoin->vout[i].nValue == MasternodeCollateral(pindexBest->nHeight)*COIN);
-                } else if (coin_type == ONLY_NONDENOMINATED_NOT10000IFMN){
-                    if (IsCollateralAmount(pcoin->vout[i].nValue)) continue; // do not use collateral amounts
+                    found = !(fMasterNode && pcoin->vout[i].nValue == MasternodeCollateral(pindexBest->nHeight) * COIN);
+                } else if (coin_type == ONLY_NONDENOMINATED_NOT10000IFMN) {
+                    if (IsCollateralAmount(pcoin->vout[i].nValue))
+                        continue; // do not use collateral amounts
                     found = !IsDenominatedAmount(pcoin->vout[i].nValue);
-                    if(found && fMasterNode) found = pcoin->vout[i].nValue != MasternodeCollateral(pindexBest->nHeight)*COIN; // do not use Hot MN funds
+                    if(found && fMasterNode)
+                        found = pcoin->vout[i].nValue != MasternodeCollateral(pindexBest->nHeight) * COIN; // do not use Hot MN funds
                 } else {
                     found = true;
                 }
@@ -2208,7 +2220,7 @@ bool CWallet::HasCollateralInputs(bool fOnlyConfirmed) const
 
 bool CWallet::IsCollateralAmount(int64_t nInputAmount) const
 {
-    return  nInputAmount != 0 && nInputAmount % DARKSEND_COLLATERAL == 0 && nInputAmount < DARKSEND_COLLATERAL * 5  && nInputAmount > DARKSEND_COLLATERAL;
+    return nInputAmount != 0 && nInputAmount % DARKSEND_COLLATERAL == 0 && nInputAmount < DARKSEND_COLLATERAL * 5 && nInputAmount > DARKSEND_COLLATERAL;
 }
 
 bool CWallet::CreateCollateralTransaction(CTransaction& txCollateral, std::string& strReason)
@@ -2298,6 +2310,8 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64_t> >& vecSend, 
                                 int64_t& nFeeRet, int nSplitBlock, int32_t& nChangePos, std::string& strFailReason, const CCoinControl* coinControl,
                                 AvailableCoinsType coin_type, bool useIX)
 {
+    if (nTransactionFee < MIN_TX_FEE)
+        nTransactionFee = MIN_TX_FEE;
 
     int64_t nValue = 0;
 
@@ -2677,7 +2691,6 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             // Search backward in time from the given txNew timestamp
             // Search nSearchInterval seconds back up to nMaxStakeSearchInterval
             COutPoint prevoutStake = COutPoint(pcoin.first->GetHash(), pcoin.second);
-            int64_t nBlockTime;
             if (CheckStakeKernelHash(nBits, block, txindex.pos.nTxPos - txindex.pos.nBlockPos, *pcoin.first, prevoutStake, txNew.nTime - n, hashProofOfStake, targetProofOfStake))
             {
                 // Found a kernel
@@ -2731,8 +2744,19 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 vwtxPrev.push_back(pcoin.first);
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut));
 
-                if(nCredit > GetStakeSplitThreshold())
-                    txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
+                // Calculate the total size of our new output including the stake reward
+                // and decide whether to split the stake outputs
+                CAmount nCoinAge;
+                CTxDB txdb("r");
+                if (txNew.GetCoinAge(txdb, pindexBest, nCoinAge))
+                {
+                    CAmount nTotalSize = pcoin.first->vout[pcoin.second].nValue + GetProofOfStakeReward(pindexBest->nHeight, nCoinAge, 0);
+                    if (nTotalSize / 2 > nStakeSplitThreshold * COIN)
+                        txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
+                }
+
+                // if(nCredit > GetStakeSplitThreshold())
+                //     txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
                 LogPrint("coinstake", "CreateCoinStake : added kernel type=%d\n", whichType);
                 fKernelFound = true;
                 break;
@@ -2759,13 +2783,13 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             if (txNew.vin.size() >= 100)
                 break;
             // Stop adding more inputs if value is already pretty significant
-            if (nCredit >= GetStakeCombineThreshold())
+            if (nCredit >= nStakeSplitThreshold)
                 break;
             // Stop adding inputs if reached reserve limit
             if (nCredit + pcoin.first->vout[pcoin.second].nValue > nBalance - nReserveBalance)
                 break;
             // Do not add additional significant input
-            if (pcoin.first->vout[pcoin.second].nValue >= GetStakeCombineThreshold())
+            if (pcoin.first->vout[pcoin.second].nValue >= nStakeSplitThreshold)
                 continue;
             // Do not add input that is still too young
             if (nTimeWeight < Params().StakeMinAge())
@@ -2780,7 +2804,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     // Calculate coin age reward
     CAmount nReward;
     {
-        uint64_t nCoinAge;
+        CAmount nCoinAge;
         CTxDB txdb("r");
         if (!txNew.GetCoinAge(txdb, pindexPrev, nCoinAge))
             return error("CreateCoinStake : failed to calculate coin age");
@@ -3714,8 +3738,7 @@ bool CWallet::IsLockedCoin(uint256 hash, unsigned int n) const
 void CWallet::ListLockedCoins(std::vector<COutPoint>& vOutpts)
 {
     AssertLockHeld(cs_wallet); // setLockedCoins
-    for (std::set<COutPoint>::iterator it = setLockedCoins.begin();
-         it != setLockedCoins.end(); it++) {
+    for (std::set<COutPoint>::iterator it = setLockedCoins.begin(); it != setLockedCoins.end(); it++) {
         COutPoint outpt = (*it);
         vOutpts.push_back(outpt);
     }

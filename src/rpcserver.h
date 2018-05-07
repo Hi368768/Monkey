@@ -88,7 +88,6 @@ extern json_spirit::Value ValueFromAmount(int64_t amount);
 extern double GetDifficulty(const CBlockIndex* blockindex = NULL);
 
 extern double GetPoWMHashPS();
-extern double GetPoSKernelPS();
 
 extern std::string HelpRequiringPassphrase();
 extern std::string HelpExampleCli(std::string methodname, std::string args);
@@ -197,5 +196,8 @@ extern json_spirit::Value masternode(const json_spirit::Array& params, bool fHel
 extern json_spirit::Value masternodelist(const json_spirit::Array& params, bool fHelp);
 
 extern json_spirit::Value cclistcoins(const json_spirit::Array& params, bool fHelp);
+
+extern json_spirit::Value setstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
 
 #endif
