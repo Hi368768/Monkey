@@ -571,11 +571,11 @@ static void ShowProgress(WalletModel *walletmodel, const std::string &title, int
                               Q_ARG(QString, QString::fromStdString(title)),
                               Q_ARG(int, nProgress));
     if (nProgress == 0)
-    	fQueueNotifications = true;
+        fQueueNotifications = true;
 
     if (nProgress == 100)
     {
-          fQueueNotifications = false;
+        fQueueNotifications = false;
         BOOST_FOREACH(const PAIRTYPE(uint256, ChangeType)& notification, vQueueNotifications)
             NotifyTransactionChanged(walletmodel, NULL, notification.first, notification.second);
         if (vQueueNotifications.size() > 10) // prevent balloon spam, show maximum 10 balloons
@@ -681,10 +681,15 @@ void WalletModel::getOutputs(const std::vector<COutPoint>& vOutpoints, std::vect
     }
 }
 
+bool WalletModel::isSpent(const COutPoint& outpoint) const
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+    return wallet->IsSpent(outpoint.hash, outpoint.n);
+}
+
 // AvailableCoins + LockedCoins grouped by wallet address (put change in one group with wallet address)
 void WalletModel::listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const
 {
-
     std::vector<COutput> vCoins;
     wallet->AvailableCoins(vCoins);
     //wallet->ListLockedCoins(vLockedCoins);

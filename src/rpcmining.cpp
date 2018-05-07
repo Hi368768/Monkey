@@ -68,7 +68,7 @@ Value getstakesubsidy(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
     }
 
-    uint64_t nCoinAge;
+    CAmount nCoinAge;
     CTxDB txdb("r");
     if (!tx.GetCoinAge(txdb, pindexBest, nCoinAge))
         throw JSONRPCError(RPC_MISC_ERROR, "GetCoinAge failed");
@@ -82,10 +82,6 @@ Value getmininginfo(const Array& params, bool fHelp)
         throw runtime_error(
             "getmininginfo\n"
             "Returns an object containing mining-related information.");
-
-    uint64_t nMinWeight, nMaxWeight, nWeight = 0;
-    if (pwalletMain)
-        pwalletMain->GetStakeWeight(nMinWeight, nMaxWeight, nWeight);
 
     // Define block rewards
     int64_t nRewardPoW = (uint64_t)GetProofOfWorkReward(nBestHeight, 0);
@@ -101,19 +97,13 @@ Value getmininginfo(const Array& params, bool fHelp)
     diff.push_back(Pair("search-interval",      (int)nLastCoinStakeSearchInterval));
     obj.push_back(Pair("difficulty",    diff));
 
-    obj.push_back(Pair("blockvalue-PoS",    nRewardPoS));
-    obj.push_back(Pair("blockvalue-PoW",    nRewardPoW));
-    obj.push_back(Pair("netmhashps",     GetPoWMHashPS()));
-    obj.push_back(Pair("netstakeweight", GetPoSKernelPS()));
+    obj.push_back(Pair("blockvalue-PoS",    nRewardPoS)); // TODO:
+    obj.push_back(Pair("blockvalue-PoW",    nRewardPoW)); // TODO:
+    obj.push_back(Pair("netmhashps",     GetPoWMHashPS())); // TODO:
     obj.push_back(Pair("errors",        GetWarnings("statusbar")));
     obj.push_back(Pair("pooledtx",      (uint64_t)mempool.size()));
 
-    weight.push_back(Pair("minimum",    (uint64_t)nMinWeight));
-    weight.push_back(Pair("maximum",    (uint64_t)nMaxWeight));
-    weight.push_back(Pair("combined",  (uint64_t)nWeight));
-    obj.push_back(Pair("stakeweight", weight));
-
-    obj.push_back(Pair("stakeinterest",    COIN_YEAR_REWARD/CENT));
+    obj.push_back(Pair("stakeinterest",    COIN_YEAR_REWARD/CENT)); // TODO:
     obj.push_back(Pair("testnet",       TestNet()));
     return obj;
 }
@@ -125,15 +115,11 @@ Value getstakinginfo(const Array& params, bool fHelp)
             "getstakinginfo\n"
             "Returns an object containing staking-related information.");
 
-    uint64_t nExpectedTime = 0;
-
     uint64_t nMinWeight = 0, nMaxWeight = 0, nWeight = 0;
     if (pwalletMain)
         pwalletMain->GetStakeWeight(nMinWeight, nMaxWeight, nWeight);
 
-    uint64_t nNetworkWeight = GetPoSKernelPS();
     bool staking = nLastCoinStakeSearchInterval && nWeight;
-    nExpectedTime = staking ? (GetTargetSpacing(nBestHeight) * nNetworkWeight / nWeight) : 0;
 
     Object obj;
 
@@ -148,10 +134,6 @@ Value getstakinginfo(const Array& params, bool fHelp)
     obj.push_back(Pair("difficulty", GetDifficulty(GetLastBlockIndex(pindexBest, true))));
     obj.push_back(Pair("search-interval", (int)nLastCoinStakeSearchInterval));
 
-    obj.push_back(Pair("weight", (uint64_t)nWeight));
-    obj.push_back(Pair("netstakeweight", (uint64_t)nNetworkWeight));
-
-    obj.push_back(Pair("expectedtime", nExpectedTime));
 
     return obj;
 }

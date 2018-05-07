@@ -423,7 +423,11 @@ bool CDarksendPool::SetCollateralAddress(std::string strAddress){
 void CDarksendPool::UnlockCoins(){
     while(true) {
         TRY_LOCK(pwalletMain->cs_wallet, lockWallet);
-        if(!lockWallet) {MilliSleep(50); continue;}
+        if(!lockWallet)
+        {
+            MilliSleep(50);
+            continue;
+        }
         BOOST_FOREACH(CTxIn v, lockedCoins)
             pwalletMain->UnlockCoin(v.prevout);
         break;

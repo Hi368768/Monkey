@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>850</width>
-    <height>400</height>
+    <height>410</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -88,6 +88,7 @@
             </property>
             <property name="font">
              <font>
+              <pointsize>16</pointsize>
               <weight>75</weight>
               <bold>true</bold>
              </font>
@@ -113,7 +114,7 @@
              <string notr="true"/>
             </property>
             <property name="text">
-             <string>Inputs...</string>
+             <string>Open Coin Control</string>
             </property>
            </widget>
           </item>
@@ -227,9 +228,6 @@
                    <bold>true</bold>
                   </font>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
-                 </property>
                  <property name="text">
                   <string>Quantity:</string>
                  </property>
@@ -245,9 +243,6 @@
                  </property>
                  <property name="contextMenuPolicy">
                   <enum>Qt::ActionsContextMenu</enum>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
                  </property>
                  <property name="text">
                   <string>0</string>
@@ -268,9 +263,6 @@
                    <bold>true</bold>
                   </font>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
-                 </property>
                  <property name="text">
                   <string>Bytes:</string>
                  </property>
@@ -283,9 +275,6 @@
                  </property>
                  <property name="contextMenuPolicy">
                   <enum>Qt::ActionsContextMenu</enum>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
                  </property>
                  <property name="text">
                   <string>0</string>
@@ -322,9 +311,6 @@
                    <bold>true</bold>
                   </font>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
-                 </property>
                  <property name="text">
                   <string>Amount:</string>
                  </property>
@@ -340,9 +326,6 @@
                  </property>
                  <property name="contextMenuPolicy">
                   <enum>Qt::ActionsContextMenu</enum>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
                  </property>
                  <property name="text">
                   <string>0.00 MONK</string>
@@ -360,9 +343,6 @@
                    <bold>true</bold>
                   </font>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
-                 </property>
                  <property name="text">
                   <string>Priority:</string>
                  </property>
@@ -375,9 +355,6 @@
                  </property>
                  <property name="contextMenuPolicy">
                   <enum>Qt::ActionsContextMenu</enum>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
                  </property>
                  <property name="text">
                   <string>medium</string>
@@ -414,9 +391,6 @@
                    <bold>true</bold>
                   </font>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
-                 </property>
                  <property name="text">
                   <string>Fee:</string>
                  </property>
@@ -432,9 +406,6 @@
                  </property>
                  <property name="contextMenuPolicy">
                   <enum>Qt::ActionsContextMenu</enum>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
                  </property>
                  <property name="text">
                   <string>0.00 MONK</string>
@@ -452,11 +423,8 @@
                    <bold>true</bold>
                   </font>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
-                 </property>
                  <property name="text">
-                  <string>Low Output:</string>
+                  <string>Dust:</string>
                  </property>
                 </widget>
                </item>
@@ -467,9 +435,6 @@
                  </property>
                  <property name="contextMenuPolicy">
                   <enum>Qt::ActionsContextMenu</enum>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
                  </property>
                  <property name="text">
                   <string>no</string>
@@ -483,6 +448,12 @@
              </item>
              <item>
               <layout class="QFormLayout" name="formLayoutCoinControl4">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+               </property>
+               <property name="rowWrapPolicy">
+                <enum>QFormLayout::DontWrapRows</enum>
+               </property>
                <property name="horizontalSpacing">
                 <number>10</number>
                </property>
@@ -506,33 +477,11 @@
                    <bold>true</bold>
                   </font>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
-                 </property>
                  <property name="text">
                   <string>After Fee:</string>
                  </property>
                  <property name="margin">
                   <number>0</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLabel" name="labelCoinControlAfterFee">
-                 <property name="cursor">
-                  <cursorShape>IBeamCursor</cursorShape>
-                 </property>
-                 <property name="contextMenuPolicy">
-                  <enum>Qt::ActionsContextMenu</enum>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
-                 </property>
-                 <property name="text">
-                  <string>0.00 MONK</string>
-                 </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
                  </property>
                 </widget>
                </item>
@@ -543,9 +492,6 @@
                    <weight>75</weight>
                    <bold>true</bold>
                   </font>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
                  </property>
                  <property name="text">
                   <string>Change</string>
@@ -560,8 +506,21 @@
                  <property name="contextMenuPolicy">
                   <enum>Qt::ActionsContextMenu</enum>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel { color: #000000; border: none;}</string>
+                 <property name="text">
+                  <string>0.00 MONK</string>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="labelCoinControlAfterFee">
+                 <property name="cursor">
+                  <cursorShape>IBeamCursor</cursorShape>
+                 </property>
+                 <property name="contextMenuPolicy">
+                  <enum>Qt::ActionsContextMenu</enum>
                  </property>
                  <property name="text">
                   <string>0.00 MONK</string>
@@ -646,9 +605,6 @@
           </item>
           <item>
            <widget class="QCheckBox" name="checkBoxCoinControlChange">
-            <property name="styleSheet">
-             <string notr="true">QLabel { color: #000000; border: none;}</string>
-            </property>
             <property name="text">
              <string>custom change address</string>
             </property>
@@ -729,7 +685,7 @@
         <x>0</x>
         <y>0</y>
         <width>824</width>
-        <height>135</height>
+        <height>142</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
