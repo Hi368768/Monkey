@@ -79,10 +79,10 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
     mapper->setOrientation(Qt::Vertical);
 
-    /* enable apply button when data modified */
-    connect(mapper, SIGNAL(viewModified()), this, SLOT(enableApplyButton()));
-    /* disable apply button when new data loaded */
-    connect(mapper, SIGNAL(currentIndexChanged(int)), this, SLOT(disableApplyButton()));
+    /* enable ok button when data modified */
+    connect(mapper, SIGNAL(viewModified()), this, SLOT(enableOkButton()));
+    /* disable ok button when new data loaded */
+    connect(mapper, SIGNAL(currentIndexChanged(int)), this, SLOT(disableOkButton()));
     /* setup/change UI elements when proxy IP is invalid/valid */
     connect(this, SIGNAL(proxyIpValid(QValidatedLineEdit *, bool)), this, SLOT(handleProxyIpValid(QValidatedLineEdit *, bool)));
 }
@@ -111,8 +111,8 @@ void OptionsDialog::setModel(OptionsModel *model)
     /* warn only when language selection changes by user action (placed here so init via mapper doesn't trigger this) */
     connect(ui->lang, SIGNAL(valueChanged()), this, SLOT(showRestartWarning_Lang()));
 
-    /* disable apply button after settings are loaded as there is nothing to save */
-    disableApplyButton();
+    /* disable ok button after settings are loaded as there is nothing to save */
+    disableOkButton();
 }
 
 void OptionsDialog::setMapper()
@@ -145,32 +145,38 @@ void OptionsDialog::setMapper()
 
 }
 
-void OptionsDialog::enableApplyButton()
-{
-    ui->applyButton->setEnabled(true);
-}
-
-void OptionsDialog::disableApplyButton()
-{
-    ui->applyButton->setEnabled(false);
-}
-
-void OptionsDialog::enableSaveButtons()
+void OptionsDialog::enableOkButton()
 {
     /* prevent enabling of the save buttons when data modified, if there is an invalid proxy address present */
-    if(fProxyIpValid)
-        setSaveButtonState(true);
+    if (fProxyIpValid)
+        setOkButtonState(true);
 }
 
-void OptionsDialog::disableSaveButtons()
+void OptionsDialog::disableOkButton()
 {
-    setSaveButtonState(false);
+    setOkButtonState(false);
 }
 
-void OptionsDialog::setSaveButtonState(bool fState)
+void OptionsDialog::setOkButtonState(bool fState)
 {
-    ui->applyButton->setEnabled(fState);
     ui->okButton->setEnabled(fState);
+}
+
+void OptionsDialog::on_resetButton_clicked()
+{
+    if (model) {
+        // confirmation dialog
+        QMessageBox::StandardButton btnRetVal = QMessageBox::question(this, tr("Confirm options reset"),
+            tr("Client restart required to activate changes.") + "<br><br>" + tr("Client will be shutdown, do you want to proceed?"),
+            QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+
+        if (btnRetVal == QMessageBox::Cancel)
+            return;
+
+        /* reset all options and close GUI */
+        model->Reset();
+        QApplication::quit();
+    }
 }
 
 void OptionsDialog::on_okButton_clicked()
@@ -182,12 +188,6 @@ void OptionsDialog::on_okButton_clicked()
 void OptionsDialog::on_cancelButton_clicked()
 {
     reject();
-}
-
-void OptionsDialog::on_applyButton_clicked()
-{
-    mapper->submit();
-    disableApplyButton();
 }
 
 void OptionsDialog::showRestartWarning_Proxy()
@@ -224,12 +224,12 @@ void OptionsDialog::handleProxyIpValid(QValidatedLineEdit *object, bool fState)
 
     if(fProxyIpValid)
     {
-        enableSaveButtons();
+        enableOkButton();
         ui->statusLabel->clear();
     }
     else
     {
-        disableSaveButtons();
+        disableOkButton();
         object->setValid(fProxyIpValid);
         ui->statusLabel->setStyleSheet("QLabel { color: red; }");
         ui->statusLabel->setText(tr("The supplied proxy address is invalid."));

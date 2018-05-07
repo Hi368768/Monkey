@@ -32,6 +32,7 @@ void OptionsModel::addOverriddenOption(const std::string &option)
 // Writes all missing QSettings with their default values
 void OptionsModel::Init()
 {
+    resetSettings = false;
     QSettings settings;
 
     // Ensure restart flag is unset on client startup
@@ -48,12 +49,10 @@ void OptionsModel::Init()
         settings.setValue("fMinimizeOnClose", false);
     fMinimizeOnClose = settings.value("fMinimizeOnClose").toBool();
 
-
     // Display
     if (!settings.contains("nDisplayUnit"))
         settings.setValue("nDisplayUnit", BitcoinUnits::BTC);
     nDisplayUnit = settings.value("nDisplayUnit").toInt();
-
 
     if (!settings.contains("fCoinControlFeatures"))
         settings.setValue("fCoinControlFeatures", false);
@@ -71,11 +70,6 @@ void OptionsModel::Init()
     if (settings.contains("nAnonymizeMonkeyAmount"))
         SoftSetArg("-anonymizeINSaNeamount", settings.value("nAnonymizeMonkeyAmount").toString().toStdString());
 
-
-
-
-
-
     // These are shared with the core or have a command-line parameter
     // and we want command-line parameters to overwrite the GUI settings.
     //
@@ -88,11 +82,12 @@ void OptionsModel::Init()
     if (!settings.contains("nTransactionFee"))
         settings.setValue("nTransactionFee", (qint64)MIN_TX_FEE);
     nTransactionFee = settings.value("nTransactionFee").toLongLong(); // if -paytxfee is set, this will be overridden later in init.cpp
+    if (nTransactionFee < MIN_TX_FEE)
+        nTransactionFee = MIN_TX_FEE;
     if (mapArgs.count("-paytxfee"))
         addOverriddenOption("-paytxfee");
     nReserveBalance = settings.value("nReserveBalance").toLongLong();
 #endif
-
 
     // Network
     if (!settings.contains("fUseUPnP"))
@@ -123,9 +118,6 @@ void OptionsModel::Init()
     if (!SoftSetArg("-lang", settings.value("language").toString().toStdString()))
         addOverriddenOption("-lang");
 
-
-
-
     language = settings.value("language").toString();
 }
 
@@ -135,6 +127,7 @@ void OptionsModel::Reset()
 
     // Remove all entries from our QSettings object
     settings.clear();
+    resetSettings = true; // Needed in bitcoin.cpp during shotdown to also remove the window positions
 
     // default setting for OptionsModel::StartAtStartup - disabled
     if (GUIUtil::GetStartOnSystemStartup())

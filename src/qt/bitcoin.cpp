@@ -20,6 +20,7 @@
 #include <QSplashScreen>
 #include <QLibraryInfo>
 #include <QFontDatabase>
+#include <QSettings>
 
 #if defined(BITCOIN_NEED_QT_PLUGINS) && !defined(_BITCOIN_QT_PLUGINS_INCLUDED)
 #define _BITCOIN_QT_PLUGINS_INCLUDED
@@ -273,7 +274,15 @@ int main(int argc, char *argv[])
                 window.setClientModel(0);
                 window.setWalletModel(0);
                 guiref = 0;
+
+                // Delete Qt-settings if user clicked on "Reset Options"
+                QSettings settings;
+                if (optionsModel.resetSettings) {
+                    settings.clear();
+                    settings.sync();
+                }
             }
+
             // Shutdown the core and its threads, but don't exit Bitcoin-Qt here
             threadGroup.interrupt_all();
             threadGroup.join_all();

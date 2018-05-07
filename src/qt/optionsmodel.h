@@ -52,7 +52,7 @@ public:
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
 
-    /* Explicit getters */
+    // Explicit getters
     qint64 getReserveBalance();
     bool getMinimizeToTray() { return fMinimizeToTray; }
     bool getMinimizeOnClose() { return fMinimizeOnClose; }
@@ -61,20 +61,22 @@ public:
     bool getCoinControlFeatures() { return fCoinControlFeatures; }
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
 
-    /* Restart flag helper */
+    // Restart flag helper
     void setRestartRequired(bool fRequired);
     bool isRestartRequired();
+    bool resetSettings;
+
 private:
-    /* Qt-only settings */
+    // Qt-only settings
     bool fMinimizeToTray;
     bool fMinimizeOnClose;
     QString language;
     int nDisplayUnit;
     bool fCoinControlFeatures;
-    /* settings that were overriden by command-line */
+    // settings that were overriden by command-line
     QString strOverriddenByCommandLine;
 
-    /// Add option to list of GUI options overridden through command line/config file
+    // Add option to list of GUI options overridden through command line/config file
     void addOverriddenOption(const std::string &option);
 
 signals:

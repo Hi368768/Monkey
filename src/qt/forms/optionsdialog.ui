@@ -460,6 +460,19 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_Buttons">
      <item>
+      <widget class="QPushButton" name="resetButton">
+       <property name="toolTip">
+        <string>Reset all client options to default.</string>
+       </property>
+       <property name="text">
+        <string>&amp;Reset Options</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_1">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -474,6 +487,12 @@
      </item>
      <item>
       <widget class="QLabel" name="statusLabel">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <weight>75</weight>
@@ -509,22 +528,18 @@
        <property name="text">
         <string>&amp;OK</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="cancelButton">
        <property name="text">
         <string>&amp;Cancel</string>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="applyButton">
-       <property name="text">
-        <string>&amp;Apply</string>
        </property>
        <property name="autoDefault">
         <bool>false</bool>

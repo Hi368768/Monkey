@@ -205,7 +205,7 @@ private slots:
     void toggleHidden();
 
     void updateWeight();
-    void updateStakingIcon();
+    void setStakingStatus();
 
     /** called by a timer to check if fRequestShutdown has been set **/
     void detectShutdown();
