@@ -88,6 +88,9 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0xc08b7e10f87514a98554968c06868edbdb6d97ad560112b3c1f9c90c09656d95"));
 
         // DNS Seeding
+        vSeeds.push_back(CDNSSeedData("monk1.cryptoservices.tk", "monk1.cryptoservices.tk"));
+        vSeeds.push_back(CDNSSeedData("monk2.cryptoservices.tk", "monk2.cryptoservices.tk"));
+        vSeeds.push_back(CDNSSeedData("monk3.cryptoservices.tk", "monk3.cryptoservices.tk"));
         vSeeds.push_back(CDNSSeedData("seed1", "seed1.monkey.vision"));
         vSeeds.push_back(CDNSSeedData("seed2", "seed2.monkey.vision"));
         vSeeds.push_back(CDNSSeedData("seed3", "seed3.monkey.vision"));
