@@ -27,7 +27,7 @@ Distributed under the MIT/X11 software license, see the accompanying file COPYIN
 
 This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/) and cryptographic software written by Eric Young (eay@cryptsoft.com) and UPnP software written by Thomas Bernard.</source>
         <translation>
-To je poizkusen softver. 
+To je poizkusen softver.
 
 Distribuiran pod MIT/X11 softversko licenco, glej priloženo datoteko COPYING ali http://www.opensource.org/licenses/mit-license.php.
 
@@ -972,12 +972,12 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
         <location line="+1"/>
         <source>This label turns red, if any recipient receives an amount smaller than %1.
 
- This means a fee of at least %2 is required. 
+ This means a fee of at least %2 is required.
 
  Amounts below 0.546 times the minimum relay fee are shown as DUST.</source>
         <translation>Ta oznaka se obarva rdeče, če prejemnik dobi količino manjšo od %1.
 
- To pomeni, da je potrebna vsaj %2 provizija.  
+ To pomeni, da je potrebna vsaj %2 provizija.
 
  Zneski pod 0.546 krat minimalna transakcijska provizija so prikazani kot PRAH.</translation>
     </message>
@@ -1080,8 +1080,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     <message>
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
-        <source>monkey-Qt</source>
-        <translation>monkey-Qt</translation>
+        <source>Monkey-Qt</source>
+        <translation>Monkey-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1560,8 +1560,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the monkey-Qt help message to get a list with possible monkey command-line options.</source>
-        <translation>Prikaži monkey-Qt sporočilo za pomoč , ki prikaže vse možnosti ukazne vrstice monkey aplikacije</translation>
+        <source>Show the Monkey-Qt help message to get a list with possible monkey command-line options.</source>
+        <translation>Prikaži Monkey-Qt sporočilo za pomoč , ki prikaže vse možnosti ukazne vrstice monkey aplikacije</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3006,22 +3006,17 @@ If the file does not exist, create it with owner-readable-only file permissions.
 It is also recommended to set alertnotify so you are notified of problems;
 for example: alertnotify=echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.com
 </source>
-        <translation>%s, nastaviti morate rpcgeslo v konfiguracijski datoteki: 
+        <translation>%s, nastaviti morate rpcgeslo v konfiguracijski datoteki:
  %s
 Priporočeno je, da uporabite naslednje naključno geslo:
 rpcuser=monkeyrpc
 rpcpassword=%s
 (tega gesla si vam ni potrebno zapomniti)
-Uporabniško ime in geslo NE SMETA biti ista. 
-Če datoteka ne obstaja, jo ustvarite z lastniškimi dovoljenji za datoteke. 
+Uporabniško ime in geslo NE SMETA biti ista.
+Če datoteka ne obstaja, jo ustvarite z lastniškimi dovoljenji za datoteke.
 Prav tako je priporočeno, da nastavite alernotify, tkako da vas opozori na probleme;
 na primer: alertnotify=echo %%s | mail -s &quot;monkey Alarm&quot; admin@foo.com
 </translation>
-    </message>
-    <message>
-        <location line="+51"/>
-        <source>Find peers using internet relay chat (default: 0)</source>
-        <translation>Najdi soležnike prek irca (privzeto: 0)</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -3313,7 +3308,7 @@ na primer: alertnotify=echo %%s | mail -s &quot;monkey Alarm&quot; admin@foo.com
         <source>You must set rpcpassword=&lt;password&gt; in the configuration file:
 %s
 If the file does not exist, create it with owner-readable-only file permissions.</source>
-        <translation>Nastaviti morate rpcpassword=&lt;password&gt; v konfiguracijski datoteki: 
+        <translation>Nastaviti morate rpcpassword=&lt;password&gt; v konfiguracijski datoteki:
 %s
 Če datoteka ne obstaja, jo ustvarite z lastniškimi dovoljenji za datoteke.</translation>
     </message>

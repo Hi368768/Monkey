@@ -1,6 +1,6 @@
 TEMPLATE = app
-TARGET = Monkey-qt
-VERSION = 2.0.0
+TARGET = Monkey-Qt
+VERSION = 2.0.1
 INCLUDEPATH += src src/json src/qt
 QT += core gui widgets network printsupport
 DEFINES += ENABLE_WALLET
@@ -152,18 +152,18 @@ INCLUDEPATH += src/leveldb/include src/leveldb/helpers
 LIBS += $$PWD/src/leveldb/libleveldb.a $$PWD/src/leveldb/libmemenv.a
 SOURCES += src/txdb-leveldb.cpp \
     src/hash.cpp \
-    src/aes_helper.c \
-    src/blake.c \
-    src/bmw.c \
-    src/cubehash.c \
-    src/echo.c \
-    src/groestl.c \
-    src/jh.c \
-    src/keccak.c \
-    src/luffa.c \
-    src/shavite.c \
-    src/simd.c \
-    src/skein.c
+    src/crypto/aes_helper.c \
+    src/crypto/blake.c \
+    src/crypto/bmw.c \
+    src/crypto/cubehash.c \
+    src/crypto/echo.c \
+    src/crypto/groestl.c \
+    src/crypto/jh.c \
+    src/crypto/keccak.c \
+    src/crypto/luffa.c \
+    src/crypto/shavite.c \
+    src/crypto/simd.c \
+    src/crypto/skein.c
 !win32 {
     # we use QMAKE_CXXFLAGS_RELEASE even without RELEASE=1 because we use RELEASE to indicate linking preferences not -O preferences
     genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a
@@ -286,7 +286,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/txmempool.h \
     src/walletdb.h \
     src/script.h \
-    src/scrypt.h \
+    src/crypto/scrypt.h \
     src/init.h \
     src/mruset.h \
     src/json/json_spirit_writer_template.h \
@@ -357,18 +357,18 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/addeditmasternode.h \
     src/qt/masternodeconfigdialog.h \
     src/qt/qvalidatedtextedit.h \
-    src/sph_blake.h \
-    src/sph_bmw.h \
-    src/sph_cubehash.h \
-    src/sph_echo.h \
-    src/sph_groestl.h \
-    src/sph_jh.h \
-    src/sph_keccak.h \
-    src/sph_luffa.h \
-    src/sph_shavite.h \
-    src/sph_simd.h \
-    src/sph_skein.h \
-    src/sph_types.h \
+    src/crypto/sph_blake.h \
+    src/crypto/sph_bmw.h \
+    src/crypto/sph_cubehash.h \
+    src/crypto/sph_echo.h \
+    src/crypto/sph_groestl.h \
+    src/crypto/sph_jh.h \
+    src/crypto/sph_keccak.h \
+    src/crypto/sph_luffa.h \
+    src/crypto/sph_shavite.h \
+    src/crypto/sph_simd.h \
+    src/crypto/sph_skein.h \
+    src/crypto/sph_types.h \
     src/limitedmap.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
@@ -445,10 +445,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/rpcconsole.cpp \
     src/noui.cpp \
     src/kernel.cpp \
-    src/scrypt-arm.S \
-    src/scrypt-x86.S \
-    src/scrypt-x86_64.S \
-    src/scrypt.cpp \
+    src/crypto/scrypt.cpp \
     src/pbkdf2.cpp \
     src/support/cleanse.cpp \
     src/qt/flowlayout.cpp \
@@ -496,9 +493,9 @@ FORMS += \
     src/qt/forms/masternodeconfigdialog.ui
 
 contains(USE_QRCODE, 1) {
-HEADERS += src/qt/qrcodedialog.h
-SOURCES += src/qt/qrcodedialog.cpp
-FORMS += src/qt/forms/qrcodedialog.ui
+    HEADERS += src/qt/qrcodedialog.h
+    SOURCES += src/qt/qrcodedialog.cpp
+    FORMS += src/qt/forms/qrcodedialog.ui
 }
 
 CODECFORTR = UTF-8
@@ -568,7 +565,6 @@ macx:OBJECTIVE_SOURCES += src/qt/macdockiconhandler.mm src/qt/macnotificationhan
 macx:LIBS += -framework Foundation -framework ApplicationServices -framework AppKit -framework CoreServices
 macx:DEFINES += MAC_OSX MSG_NOSIGNAL=0
 macx:ICON = src/qt/res/icons/monkey.icns
-macx:TARGET = "Monkey-Qt"
 macx:QMAKE_CFLAGS_THREAD += -pthread
 macx:QMAKE_LFLAGS_THREAD += -pthread
 macx:QMAKE_CXXFLAGS_THREAD += -pthread

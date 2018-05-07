@@ -944,7 +944,7 @@ Address: %4
  Can vary +/- 1 Byte per input.</source>
         <translation>Aquesta etiqueta es tornarà vermell, si la mida de la transacció és més gran que 10000 bytes.
 
-En aquest cas es requereix una comisió d&apos;almenys el 1% per kb. 
+En aquest cas es requereix una comisió d&apos;almenys el 1% per kb.
 
 Pot variar + / - 1 Byte per entrada.</translation>
     </message>
@@ -955,7 +955,7 @@ Pot variar + / - 1 Byte per entrada.</translation>
 This label turns red, if the priority is smaller than &quot;medium&quot;.
 
  This means a fee of at least %1 per kb is required.</source>
-        <translation>Les operacions amb més prioritat entren mes facilment a un bloc. 
+        <translation>Les operacions amb més prioritat entren mes facilment a un bloc.
 
 Aquesta etiqueta es torna vermella, si la prioritat és menor que &quot;mitja&quot;.
 
@@ -965,7 +965,7 @@ En aquest cas es requereix una comisió d&apos;almenys el 1% per kb.</translatio
         <location line="+1"/>
         <source>This label turns red, if any recipient receives an amount smaller than %1.
 
- This means a fee of at least %2 is required. 
+ This means a fee of at least %2 is required.
 
  Amounts below 0.546 times the minimum relay fee are shown as DUST.</source>
         <translation>Aquesta etiqueta es torna vermella, si qualsevol beneficiari rep una quantitat inferior a 1%.
@@ -1073,8 +1073,8 @@ En aquest cas es requereix una comisió d&apos;almenys 2%.</translation>
     <message>
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
-        <source>monkey-Qt</source>
-        <translation>monkey-Qt</translation>
+        <source>Monkey-Qt</source>
+        <translation>Monkey-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1553,8 +1553,8 @@ En aquest cas es requereix una comisió d&apos;almenys 2%.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the monkey-Qt help message to get a list with possible monkey command-line options.</source>
-        <translation>Mostra el missatge d&apos;ajuda de monkey-Qt per obtenir una llista amb les possibles opcions de línia d&apos;ordres monkey.</translation>
+        <source>Show the Monkey-Qt help message to get a list with possible monkey command-line options.</source>
+        <translation>Mostra el missatge d&apos;ajuda de Monkey-Qt per obtenir una llista amb les possibles opcions de línia d&apos;ordres monkey.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3010,11 +3010,6 @@ Si no hi ha l&apos;arxiu, s&apos;ha de crear amb els permisos de només lectura 
 També es recomana establir alertnotify per a que se li notifiquin els problemes;
 per exemple: alertnotify=echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.com
 </translation>
-    </message>
-    <message>
-        <location line="+51"/>
-        <source>Find peers using internet relay chat (default: 0)</source>
-        <translation>Trobar companys utilitzant l&apos;IRC (per defecte: 1) {0)?}</translation>
     </message>
     <message>
         <location line="+5"/>

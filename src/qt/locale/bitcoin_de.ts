@@ -963,7 +963,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location line="+1"/>
         <source>This label turns red, if any recipient receives an amount smaller than %1.
 
- This means a fee of at least %2 is required. 
+ This means a fee of at least %2 is required.
 
  Amounts below 0.546 times the minimum relay fee are shown as DUST.</source>
         <translation type="unfinished"/>
@@ -1065,7 +1065,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     <message>
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
-        <source>monkey-Qt</source>
+        <source>Monkey-Qt</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -1545,7 +1545,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the monkey-Qt help message to get a list with possible monkey command-line options.</source>
+        <source>Show the Monkey-Qt help message to get a list with possible monkey command-line options.</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -2991,11 +2991,6 @@ It is also recommended to set alertnotify so you are notified of problems;
 for example: alertnotify=echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.com
 </source>
         <translation type="unfinished"/>
-    </message>
-    <message>
-        <location line="+51"/>
-        <source>Find peers using internet relay chat (default: 0)</source>
-        <translation>Knoten die IRC Chat nutzen auffinden (Standard: 1) (0)?)</translation>
     </message>
     <message>
         <location line="+5"/>

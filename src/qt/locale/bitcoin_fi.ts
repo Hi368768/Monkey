@@ -972,7 +972,7 @@ Tämä tarkoittaa, että ainakin %1 rahansiirtopalkkio per kilotavu tarvitaan.</
         <location line="+1"/>
         <source>This label turns red, if any recipient receives an amount smaller than %1.
 
- This means a fee of at least %2 is required. 
+ This means a fee of at least %2 is required.
 
  Amounts below 0.546 times the minimum relay fee are shown as DUST.</source>
         <translation>Tämä nimike muuttuu punaiseksi, jos jokin asiakas saa pienemmän määrän kuin %1.
@@ -1080,8 +1080,8 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
     <message>
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
-        <source>monkey-Qt</source>
-        <translation>monkey-Qt</translation>
+        <source>Monkey-Qt</source>
+        <translation>Monkey-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1560,8 +1560,8 @@ Tämä tarkoittaa, että ainakin %2 rahansiirtopalkkio tarvitaan.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the monkey-Qt help message to get a list with possible monkey command-line options.</source>
-        <translation>Näytä monkey-Qt:n avustusohje saadaksesi listan käytettävistä monkeyin komentokehotteen määritteistä.</translation>
+        <source>Show the Monkey-Qt help message to get a list with possible monkey command-line options.</source>
+        <translation>Näytä Monkey-Qt:n avustusohje saadaksesi listan käytettävistä monkeyin komentokehotteen määritteistä.</translation>
     </message>
     <message>
         <location line="+3"/>

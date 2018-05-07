@@ -970,7 +970,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <location line="+1"/>
         <source>This label turns red, if any recipient receives an amount smaller than %1.
 
- This means a fee of at least %2 is required. 
+ This means a fee of at least %2 is required.
 
  Amounts below 0.546 times the minimum relay fee are shown as DUST.</source>
         <translation>如果收款人所收款项少于 %1，该标签变为红色。
@@ -1075,8 +1075,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     <message>
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
-        <source>monkey-Qt</source>
-        <translation>黑币客户端monkey-Qt</translation>
+        <source>Monkey-Qt</source>
+        <translation>黑币客户端Monkey-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1555,7 +1555,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the monkey-Qt help message to get a list with possible monkey command-line options.</source>
+        <source>Show the Monkey-Qt help message to get a list with possible monkey command-line options.</source>
         <translation>显示关于命令行选项的帮助信息。</translation>
     </message>
     <message>

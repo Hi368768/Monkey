@@ -974,7 +974,7 @@ Acest lucru inseamna ca este necesar un comision cel putin de %1 pe kB</translat
         <location line="+1"/>
         <source>This label turns red, if any recipient receives an amount smaller than %1.
 
- This means a fee of at least %2 is required. 
+ This means a fee of at least %2 is required.
 
  Amounts below 0.546 times the minimum relay fee are shown as DUST.</source>
         <translation>Aceasta eticheta se inroseste daca oricare din contacte primeste o suma mai mica decat %1.
@@ -1082,8 +1082,8 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
     <message>
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
-        <source>monkey-Qt</source>
-        <translation>monkey-Qt</translation>
+        <source>Monkey-Qt</source>
+        <translation>Monkey-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1562,8 +1562,8 @@ Acest lucru înseamnă că o taxă de cel puțin %2 este necesară</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the monkey-Qt help message to get a list with possible monkey command-line options.</source>
-        <translation>Afișa mesajul de ajutor monkey-Qt pentru a obține o listă cu posibile opțiuni de linie de comandă monkey.</translation>
+        <source>Show the Monkey-Qt help message to get a list with possible monkey command-line options.</source>
+        <translation>Afișa mesajul de ajutor Monkey-Qt pentru a obține o listă cu posibile opțiuni de linie de comandă monkey.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3017,11 +3017,6 @@ Dacă fișierul nu există, creați-l cu drepturi de citire doar de către deți
 Este deasemenea recomandat să setați alertnotify pentru a fi notificat de probleme;
 de exemplu: alertnotify=echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.com
 </translation>
-    </message>
-    <message>
-        <location line="+51"/>
-        <source>Find peers using internet relay chat (default: 0)</source>
-        <translation>Gaseste noduri fosoling irc (implicit: 1) {0)?}</translation>
     </message>
     <message>
         <location line="+5"/>

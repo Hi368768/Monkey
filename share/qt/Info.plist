@@ -13,14 +13,14 @@
 	<key>CFBundleExecutable</key>
 	<string>Monkey-Qt</string>
 	<key>CFBundleIdentifier</key>
-	<string>community.monkey.Monkey-Qt</string>
+	<string>vision.monkey.Monkey-Qt</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 		<key>CFBundleTypeRole</key>
 		<string>Editor</string>
 		<key>CFBundleURLName</key>
-		<string>community.monkey.Monkey-Qt</string>
+		<string>vision.monkey.Monkey-Qt</string>
 		<key>CFBundleURLSchemes</key>
 		<array>
 			<string>monkey</string>

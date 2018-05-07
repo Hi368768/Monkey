@@ -974,12 +974,12 @@ Cela implique que des frais d&apos;un minimum de %1 par kb sont requis</translat
         <location line="+1"/>
         <source>This label turns red, if any recipient receives an amount smaller than %1.
 
- This means a fee of at least %2 is required. 
+ This means a fee of at least %2 is required.
 
  Amounts below 0.546 times the minimum relay fee are shown as DUST.</source>
         <translation>Cette étiquette passe au rouge, Lorsqu&apos;un destinataire reçoit un montant inférieur à %1.
 
-Cela implique que des frais à hauteur de %2 seront nécessaire 
+Cela implique que des frais à hauteur de %2 seront nécessaire
 
 Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent en tant que DUST.</translation>
     </message>
@@ -1082,8 +1082,8 @@ Cela implique que des frais à hauteur d&apos;au moins %2 seront nécessaires.</
     <message>
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
-        <source>monkey-Qt</source>
-        <translation>monkey-Qt</translation>
+        <source>Monkey-Qt</source>
+        <translation>Monkey-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1562,8 +1562,8 @@ Cela implique que des frais à hauteur d&apos;au moins %2 seront nécessaires.</
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the monkey-Qt help message to get a list with possible monkey command-line options.</source>
-        <translation>Afficher le message d&apos;aide monkey-Qt afin d&apos;obtenir la liste des options de de L&apos;outil en ligne de commande monkey</translation>
+        <source>Show the Monkey-Qt help message to get a list with possible monkey command-line options.</source>
+        <translation>Afficher le message d&apos;aide Monkey-Qt afin d&apos;obtenir la liste des options de de L&apos;outil en ligne de commande monkey</translation>
     </message>
     <message>
         <location line="+3"/>

@@ -21,10 +21,10 @@ BEGIN
             VALUE "CompanyName",        "Monkey"
             VALUE "FileDescription",    "Monkey-Qt (OSS GUI client for Monkey)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
-            VALUE "InternalName",       "Monkey-qt"
+            VALUE "InternalName",       "Monkey-Qt"
             VALUE "LegalCopyright",     "2009-2012 The Bitcoin developers, 2012-2013 The PPCoin developers, 2017-2018 The Monkey develoeprs"
             VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
-            VALUE "OriginalFilename",   "Monkey-qt.exe"
+            VALUE "OriginalFilename",   "Monkey-Qt.exe"
             VALUE "ProductName",        "Monkey-Qt"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END

@@ -144,6 +144,7 @@ int main(int argc, char *argv[])
         // This message can not be translated, as translation is not initialized yet
         // (which not yet possible because lang=XX can be overridden in bitcoin.conf in the data directory)
         QMessageBox::critical(0, "monkey",
+        QMessageBox::critical(0, "Monkey",
                               QString("Error: Specified data directory \"%1\" does not exist.").arg(QString::fromStdString(mapArgs["-datadir"])));
         return 1;
     }
@@ -152,11 +153,14 @@ int main(int argc, char *argv[])
     // Application identification (must be set before OptionsModel is initialized,
     // as it is used to locate QSettings)
     app.setOrganizationName("monkey");
+    app.setOrganizationName("Monkey");
     //XXX app.setOrganizationDomain("");
     if(GetBoolArg("-testnet", false)) // Separate UI settings for testnet
         app.setApplicationName("monkey-Qt-testnet");
+        app.setApplicationName("Monkey-Qt-testnet");
     else
         app.setApplicationName("monkey-Qt");
+        app.setApplicationName("Monkey-Qt");
 
     // ... then GUI settings:
     OptionsModel optionsModel;

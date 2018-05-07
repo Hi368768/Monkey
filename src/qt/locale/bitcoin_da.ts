@@ -952,7 +952,7 @@ Adresse: %4
 
  Can vary +/- 1 Byte per input.</source>
         <translation>Denne etiket bliver rød, hvis transaktionen størrelse er større end 10000 byte.
- 
+
 Det betyder, at et gebyr på mindst %1 per kb er påkrævet.
 
 Kan variere + / - 1 byte per indgang.</translation>
@@ -965,22 +965,22 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
 
  This means a fee of at least %1 per kb is required.</source>
         <translation>Transaktioner med højere prioritet får mere sandsynligt en blok.
- 
+
 Denne etiket bliver rød, hvis prioritet er mindre end &quot;medium&quot;.
- 
+
 Det betyder, at et gebyr på mindst %1 per kb er påkrævet.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This label turns red, if any recipient receives an amount smaller than %1.
 
- This means a fee of at least %2 is required. 
+ This means a fee of at least %2 is required.
 
  Amounts below 0.546 times the minimum relay fee are shown as DUST.</source>
         <translation>Denne etiket bliver rød, hvis nogen modtager et beløb, der er mindre end %1.
- 
-Det betyder, at et gebyr på mindst %2 er påkrævet. 
- 
+
+Det betyder, at et gebyr på mindst %2 er påkrævet.
+
 Beløb under 0,546 gange det minimale gebyr er vist som DUST.</translation>
     </message>
     <message>
@@ -988,8 +988,8 @@ Beløb under 0,546 gange det minimale gebyr er vist som DUST.</translation>
         <source>This label turns red, if the change is smaller than %1.
 
  This means a fee of at least %2 is required.</source>
-        <translation>Denne etiket bliver rød, hvis ændringen er mindre end %1. 
- 
+        <translation>Denne etiket bliver rød, hvis ændringen er mindre end %1.
+
 Det betyder, at et gebyr på mindst %2 er påkrævet.</translation>
     </message>
     <message>
@@ -1082,8 +1082,8 @@ Det betyder, at et gebyr på mindst %2 er påkrævet.</translation>
     <message>
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
-        <source>monkey-Qt</source>
-        <translation>monkey-Qt</translation>
+        <source>Monkey-Qt</source>
+        <translation>Monkey-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1562,8 +1562,8 @@ Det betyder, at et gebyr på mindst %2 er påkrævet.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the monkey-Qt help message to get a list with possible monkey command-line options.</source>
-        <translation>Vis monkey-Qt hjælpe besked for at få en liste med mulige monkey kommandolinjeparametre.</translation>
+        <source>Show the Monkey-Qt help message to get a list with possible monkey command-line options.</source>
+        <translation>Vis Monkey-Qt hjælpe besked for at få en liste med mulige monkey kommandolinjeparametre.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3008,16 +3008,16 @@ If the file does not exist, create it with owner-readable-only file permissions.
 It is also recommended to set alertnotify so you are notified of problems;
 for example: alertnotify=echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.com
 </source>
-        <translation>% s, skal du indstille et rpcpassword i konfigurationsfilen: 
-% s 
-Det anbefales at bruge følgende tilfældig adgangskode: 
-rpcuser = monkeyrpc  
-rpcpassword =% s  
-(du behøver ikke at huske denne adgangskode)  
-Brugernavn og adgangskode må ikke være den samme.  
-Hvis filen ikke findes, skal du oprette den med filtilladelser ejer-læsbar-kun. 
-Det kan også anbefales at sætte alertnotify så du får besked om problemer; 
-for eksempel: alertnotify = echo%% s | mail-s &quot;monkey Alert&quot; admin@foo.com 
+        <translation>% s, skal du indstille et rpcpassword i konfigurationsfilen:
+% s
+Det anbefales at bruge følgende tilfældig adgangskode:
+rpcuser = monkeyrpc
+rpcpassword =% s
+(du behøver ikke at huske denne adgangskode)
+Brugernavn og adgangskode må ikke være den samme.
+Hvis filen ikke findes, skal du oprette den med filtilladelser ejer-læsbar-kun.
+Det kan også anbefales at sætte alertnotify så du får besked om problemer;
+for eksempel: alertnotify = echo%% s | mail-s &quot;monkey Alert&quot; admin@foo.com
 </translation>
     </message>
     <message>

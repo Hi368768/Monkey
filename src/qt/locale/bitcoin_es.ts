@@ -967,7 +967,7 @@ Puede variar + / - 1 Byte por entrada.</translation>
 This label turns red, if the priority is smaller than &quot;medium&quot;.
 
  This means a fee of at least %1 per kb is required.</source>
-        <translation>Las transacciones con mayor prioridad son más probables en entrar hacia un bloque. 
+        <translation>Las transacciones con mayor prioridad son más probables en entrar hacia un bloque.
 
 Esta etiqueta se convierte en rojo, si la prioridad es menor que &quot;medium&quot;.
 
@@ -977,7 +977,7 @@ Esto significa que se requiere una cuota de al menos el %1 por kb.</translation>
         <location line="+1"/>
         <source>This label turns red, if any recipient receives an amount smaller than %1.
 
- This means a fee of at least %2 is required. 
+ This means a fee of at least %2 is required.
 
  Amounts below 0.546 times the minimum relay fee are shown as DUST.</source>
         <translation>Esta etiqueta se convierte en rojo, si cualquier recipiente recibe una cantidad menor que %1.
@@ -1085,8 +1085,8 @@ Esto significa que se requiere una cuota de al menos %2.</translation>
     <message>
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
-        <source>monkey-Qt</source>
-        <translation>monkey-Qt</translation>
+        <source>Monkey-Qt</source>
+        <translation>Monkey-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1565,8 +1565,8 @@ Esto significa que se requiere una cuota de al menos %2.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the monkey-Qt help message to get a list with possible monkey command-line options.</source>
-        <translation>Mostrar el mensaje de ayuda de monkey-Qt para obtener una lista con las posibles opciones de línea de comandos para monkey.</translation>
+        <source>Show the Monkey-Qt help message to get a list with possible monkey command-line options.</source>
+        <translation>Mostrar el mensaje de ayuda de Monkey-Qt para obtener una lista con las posibles opciones de línea de comandos para monkey.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3029,11 +3029,6 @@ Si no existe el archivo, créelo con permisos de sólo lectura para el dueño.
 También se recomienda establecer alertnotify para ser notificado de los problemas;
 por ejemplo: alertnotify=echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.com
 </translation>
-    </message>
-    <message>
-        <location line="+51"/>
-        <source>Find peers using internet relay chat (default: 0)</source>
-        <translation>Encontrar pares usando IRC (por defecto:1) {0)?}</translation>
     </message>
     <message>
         <location line="+5"/>

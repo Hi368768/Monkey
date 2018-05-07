@@ -29,9 +29,9 @@ Distributed under the MIT/X11 software license, see the accompanying file COPYIN
 
 This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/) and cryptographic software written by Eric Young (eay@cryptsoft.com) and UPnP software written by Thomas Bernard.</source>
         <translation>
-Toto je experimentálny softvér. 
+Toto je experimentálny softvér.
 
-Distribuovaný pod softvérovou licenciou MIT/X11, viď priložený súbor COPYING alebo http://www.opensource.org/licenses/mit-license.php. 
+Distribuovaný pod softvérovou licenciou MIT/X11, viď priložený súbor COPYING alebo http://www.opensource.org/licenses/mit-license.php.
 
 Tento produkt obsahuje softvér vyvinutý Projektom OpenSSL Project pre použitie v sade OpenSSL Toolkit (http://www.openssl.org/) a šifrovací softvér, ktorý napísal Eric Young (eay@cryptsoft.com) a UPnP softvér napísaný Thomas Bernard.</translation>
     </message>
@@ -973,7 +973,7 @@ Tento popis sčervená, ak je prioritou menšia ako &quot;stredná&quot;.
         <location line="+1"/>
         <source>This label turns red, if any recipient receives an amount smaller than %1.
 
- This means a fee of at least %2 is required. 
+ This means a fee of at least %2 is required.
 
  Amounts below 0.546 times the minimum relay fee are shown as DUST.</source>
         <translation>Tento popis sčervená, ak je príjemca dostane sumu menšiu ako %1.
@@ -1081,8 +1081,8 @@ Sumy nižšie ako 0,546 násobok minimálneho poplatku sú zobrazené ako DUST.<
     <message>
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
-        <source>monkey-Qt</source>
-        <translation>monkey-Qt</translation>
+        <source>Monkey-Qt</source>
+        <translation>Monkey-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1561,8 +1561,8 @@ Sumy nižšie ako 0,546 násobok minimálneho poplatku sú zobrazené ako DUST.<
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the monkey-Qt help message to get a list with possible monkey command-line options.</source>
-        <translation>Zobraziť monkey-Qt nápovedu k získaniu zoznamu pre možnosti monkey príkazového riadku.</translation>
+        <source>Show the Monkey-Qt help message to get a list with possible monkey command-line options.</source>
+        <translation>Zobraziť Monkey-Qt nápovedu k získaniu zoznamu pre možnosti monkey príkazového riadku.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3013,7 +3013,7 @@ Je odporúčané použiť nasledujúce náhodné heslo:
 rpcuser=monkeyrpc
 rpcpassword=%s
 (Nemusíte si pamätať toto heslo)
-Užívateľské meno a heslo nesmú byť rovnaké. 
+Užívateľské meno a heslo nesmú byť rovnaké.
 Ak súbor neexistuje, vytvorte ho s oprávneniami súborov vlastníkov iba na čítatanie.
 Odporúča sa tiež nastaviť alertnotify, takže budete upozornení na problémy;
 napríklad: alertnotify=echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.com</translation>

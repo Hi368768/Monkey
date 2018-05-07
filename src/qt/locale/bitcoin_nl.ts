@@ -974,12 +974,12 @@ Dit betekend een fee van minimaal %1 per kb is noodzakelijk.</translation>
         <location line="+1"/>
         <source>This label turns red, if any recipient receives an amount smaller than %1.
 
- This means a fee of at least %2 is required. 
+ This means a fee of at least %2 is required.
 
  Amounts below 0.546 times the minimum relay fee are shown as DUST.</source>
-        <translation>Dit label wordt rood, als elke ontvanger ontvangt een bedrag dat kleiner is dan 1%. 
+        <translation>Dit label wordt rood, als elke ontvanger ontvangt een bedrag dat kleiner is dan 1%.
 
-Dit betekent dat een vergoeding van ten minste 2% is vereist. 
+Dit betekent dat een vergoeding van ten minste 2% is vereist.
 
 Bedragen onder 0.546 keer het minimum vergoeding worden weergegeven als DUST.</translation>
     </message>
@@ -1082,8 +1082,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     <message>
         <location filename="../guiutil.cpp" line="+420"/>
         <location line="+12"/>
-        <source>monkey-Qt</source>
-        <translation>monkey-Qt</translation>
+        <source>Monkey-Qt</source>
+        <translation>Monkey-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1562,7 +1562,7 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the monkey-Qt help message to get a list with possible monkey command-line options.</source>
+        <source>Show the Monkey-Qt help message to get a list with possible monkey command-line options.</source>
         <translation>Laat het monkey-QT help bericht zien om een lijst te krijgen met mogelijke monkey command-regel opties.</translation>
     </message>
     <message>
@@ -2942,7 +2942,7 @@ Dit betekend dat een fee van %2 is vereist.</translation>
         <location line="+109"/>
         <source>Unable to sign checkpoint, wrong checkpointkey?
 </source>
-        <translation>Kan checkpoint niet ondertekenen, verkeerde checkpoint sleutel? 
+        <translation>Kan checkpoint niet ondertekenen, verkeerde checkpoint sleutel?
 </translation>
     </message>
     <message>
@@ -3008,15 +3008,15 @@ If the file does not exist, create it with owner-readable-only file permissions.
 It is also recommended to set alertnotify so you are notified of problems;
 for example: alertnotify=echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.com
 </source>
-        <translation>%s, u moet een rpcpassword instellen in het configuratiebestand: 
-%s 
-Het wordt aanbevolen de volgende willekeurig wachtwoord gebruiken: 
-rpcuser = monkeyrpc 
-rpcpassword = %s 
-(je hoeft niet dit wachtwoord te onthouden) 
-De gebruikersnaam en het wachtwoord MAG NIET hetzelfde zijn. 
-Als het bestand niet bestaat, maakt u met leesbare-alleen-eigenaar bestandsbeheermachtigingen.  
-Het wordt ook aanbevolen om alertnotify instellen zodat u een melding van problemen;  
+        <translation>%s, u moet een rpcpassword instellen in het configuratiebestand:
+%s
+Het wordt aanbevolen de volgende willekeurig wachtwoord gebruiken:
+rpcuser = monkeyrpc
+rpcpassword = %s
+(je hoeft niet dit wachtwoord te onthouden)
+De gebruikersnaam en het wachtwoord MAG NIET hetzelfde zijn.
+Als het bestand niet bestaat, maakt u met leesbare-alleen-eigenaar bestandsbeheermachtigingen.
+Het wordt ook aanbevolen om alertnotify instellen zodat u een melding van problemen;
 bijvoorbeeld: alertnotify = echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.com </translation>
     </message>
     <message>
