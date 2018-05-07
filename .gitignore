@@ -2,8 +2,8 @@
 build
 Makefile
 Makefile.*
-monkey-Qt.app
-Monkey-qt*
+Monkey-Qt.app
+Monkey-Qt*
 monkeyd
 .qmake.stash
 Makefile

@@ -6,56 +6,49 @@
 # Mac OS X makefile for monkey
 # Originally by Laszlo Hanyecz (solar@heliacal.net)
 
-CXX=llvm-g++
-DEPSDIR=/opt/local
+LINK:=$(CXX)
+USE_WALLET:=1
 
-INCLUDEPATHS= \
- -I"$(CURDIR)" \
- -I"$(CURDIR)"/obj \
- -I"$(DEPSDIR)/include" \
- -I"$(DEPSDIR)/include/db48"
+CXX=llvm-g++
+DEPSDIR=/usr/local
+
+CXXFLAGS += \
+    -I"$(CURDIR)" \
+    -I"$(CURDIR)"/obj \
+    -I"$(DEPSDIR)/include" \
+    -I"$(DEPSDIR)/opt/berkeley-db@4/include" \
+    -I"$(DEPSDIR)/opt/openssl/include"
 
 LIBPATHS= \
- -L"$(DEPSDIR)/lib" \
- -L"$(DEPSDIR)/lib/db48"
+    -L"$(DEPSDIR)/lib" \
+    -L"$(DEPSDIR)/opt/berkeley-db@4/lib"
 
 USE_UPNP:=1
 USE_IPV6:=1
 
 LIBS= -dead_strip
 
-ifdef STATIC
-# Build STATIC if you are redistributing the monkeyd binary
 LIBS += \
- $(DEPSDIR)/lib/db48/libdb_cxx-4.8.a \
- $(DEPSDIR)/lib/libboost_system-mt.a \
- $(DEPSDIR)/lib/libboost_filesystem-mt.a \
- $(DEPSDIR)/lib/libboost_program_options-mt.a \
- $(DEPSDIR)/lib/libboost_thread-mt.a \
- $(DEPSDIR)/lib/libssl.a \
- $(DEPSDIR)/lib/libcrypto.a \
- -lz
-else
-LIBS += \
- -ldb_cxx-4.8 \
- -lboost_system-mt \
- -lboost_filesystem-mt \
- -lboost_program_options-mt \
- -lboost_thread-mt \
- -lssl \
- -lcrypto \
- -lz
-endif
+    $(DEPSDIR)/opt/berkeley-db@4/lib/libdb_cxx-4.8.a \
+    $(DEPSDIR)/lib/libboost_system-mt.a \
+    $(DEPSDIR)/lib/libboost_filesystem-mt.a \
+    $(DEPSDIR)/lib/libboost_program_options-mt.a \
+    $(DEPSDIR)/lib/libboost_thread-mt.a \
+    $(DEPSDIR)/lib/libboost_chrono-mt.a \
+    $(DEPSDIR)/opt/openssl/lib/libssl.a \
+    $(DEPSDIR)/opt/openssl/lib/libcrypto.a \
+    -lz \
+    -lgmp
 
-DEFS=-DMAC_OSX -DMSG_NOSIGNAL=0 -DBOOST_SPIRIT_THREADSAFE
+DEFS=-DMAC_OSX -DMSG_NOSIGNAL=0 -DBOOST_SPIRIT_THREADSAFE -DENABLE_WALLET
 
-ifdef RELEASE
+ifeq (${RELEASE}, 1)
 # Compile for maximum compatibility and smallest size.
 # This requires that dependencies are compiled
 # the same way.
-CFLAGS = -mmacosx-version-min=10.5 -arch x86_64 -O3 -msse2
+CXXFLAGS += -mmacosx-version-min=10.10 -arch x86_64 -O3 -msse2
 else
-CFLAGS = -g -msse2
+CXXFLAGS += -g -msse2
 endif
 
 
@@ -63,6 +56,8 @@ endif
 # adds some defaults in front. Unfortunately, CXXFLAGS=... $(CXXFLAGS) does not work.
 xCXXFLAGS=-std=c++11 -O2 $(EXT_OPTIONS) -pthread -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter -Wunused-function -Wunused-variable -fpermissive -Wconversion-null\
     $(DEBUGFLAGS) $(DEFS) $(HARDENING) $(CXXFLAGS)
+xCPPFLAGS=-x c -O2 $(EXT_OPTIONS) -pthread -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter -Wunused-function -Wunused-variable -fpermissive -Wconversion-null\
+    $(DEBUGFLAGS) $(DEFS) $(HARDENING) $(CPPFLAGS)
 
 # LDFLAGS can be specified on the make command line, so we use xLDFLAGS that only
 # adds some defaults in front. Unfortunately, LDFLAGS=... $(LDFLAGS) does not work.
@@ -96,7 +91,7 @@ OBJS= \
     obj/rpcblockchain.o \
     obj/rpcrawtransaction.o \
     obj/script.o \
-    obj/scrypt.o \
+    obj/crypto/scrypt.o \
     obj/sync.o \
     obj/txmempool.o \
     obj/util.o \
@@ -121,30 +116,25 @@ OBJS= \
     obj/crypto/sha1.o \
     obj/crypto/sha256.o \
     obj/crypto/sha512.o \
-    obj/cubehash.o \
-    obj/luffa.o \
-    obj/aes_helper.o \
-    obj/echo.o \
-    obj/shavite.o \
-    obj/simd.o \
-    obj/blake.o\
-    obj/bmw.o\
-    obj/groestl.o\
-    obj/jh.o\
-    obj/keccak.o\
-    obj/skein.o
-
-ifeq (${USE_WALLET}, 1)
-    DEFS += -DENABLE_WALLET
-    OBJS += \
-        obj/db.o \
-        obj/miner.o \
-        obj/rpcdump.o \
-        obj/rpcmining.o \
-        obj/rpcwallet.o \
-        obj/wallet.o \
-        obj/walletdb.o
-endif
+    obj/crypto/cubehash.o \
+    obj/crypto/luffa.o \
+    obj/crypto/aes_helper.o \
+    obj/crypto/echo.o \
+    obj/crypto/shavite.o \
+    obj/crypto/simd.o \
+    obj/crypto/blake.o\
+    obj/crypto/bmw.o\
+    obj/crypto/groestl.o\
+    obj/crypto/jh.o\
+    obj/crypto/keccak.o \
+    obj/crypto/skein.o \
+    obj/db.o \
+    obj/miner.o \
+    obj/rpcdump.o \
+    obj/rpcmining.o \
+    obj/rpcwallet.o \
+    obj/wallet.o \
+    obj/walletdb.o
 
 all: monkeyd
 
@@ -179,7 +169,7 @@ obj/%.o: %.cpp
 	  rm -f $(@:%.o=%.d)
 
 obj/%.o: %.c
-	$(CXX) -c $(xCXXFLAGS) -fpermissive -MMD -MF $(@:%.o=%.d) -o $@ $<
+	$(CXX) -c $(xCPPFLAGS) -fpermissive -MMD -MF $(@:%.o=%.d) -o $@ $<
 	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
 	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
 	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
