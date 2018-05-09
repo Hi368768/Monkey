@@ -341,18 +341,38 @@ inline std::string HexStr(const T& vch, bool fSpaces=false)
     return HexStr(vch.begin(), vch.end(), fSpaces);
 }
 
-inline int64_t GetPerformanceCounter()
+static inline int64_t GetPerformanceCounter()
 {
-    int64_t nCounter = 0;
-#ifdef WIN32
-    QueryPerformanceCounter((LARGE_INTEGER*)&nCounter);
+    // Read the hardware time stamp counter when available.
+    // See https://en.wikipedia.org/wiki/Time_Stamp_Counter for more information.
+#if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
+    return __rdtsc();
+#elif !defined(_MSC_VER) && defined(__i386__)
+    uint64_t r = 0;
+    __asm__ volatile ("rdtsc" : "=A"(r)); // Constrain the r variable to the eax:edx pair.
+    return r;
+#elif !defined(_MSC_VER) && (defined(__x86_64__) || defined(__amd64__))
+    uint64_t r1 = 0, r2 = 0;
+    __asm__ volatile ("rdtsc" : "=a"(r1), "=d"(r2)); // Constrain r1 to rax and r2 to rdx.
+    return (r2 << 32) | r1;
 #else
-    timeval t;
-    gettimeofday(&t, NULL);
-    nCounter = (int64_t) t.tv_sec * 1000000 + t.tv_usec;
+    // Fall back to using C++11 clock (usually microsecond or nanosecond precision)
+    return std::chrono::high_resolution_clock::now().time_since_epoch().count();
 #endif
-    return nCounter;
 }
+
+// inline int64_t GetPerformanceCounter()
+// {
+//     int64_t nCounter = 0;
+// #ifdef WIN32
+//     QueryPerformanceCounter((LARGE_INTEGER*)&nCounter);
+// #else
+//     timeval t;
+//     gettimeofday(&t, NULL);
+//     nCounter = (int64_t) t.tv_sec * 1000000 + t.tv_usec;
+// #endif
+//     return nCounter;
+// }
 
 inline int64_t GetTimeMillis()
 {
@@ -546,30 +566,7 @@ public:
     }
 };
 
-#ifdef WIN32
-inline void SetThreadPriority(int nPriority)
-{
-    SetThreadPriority(GetCurrentThread(), nPriority);
-}
-#else
-
-#define THREAD_PRIORITY_LOWEST          PRIO_MAX
-#define THREAD_PRIORITY_BELOW_NORMAL    2
-#define THREAD_PRIORITY_NORMAL          0
-#define THREAD_PRIORITY_ABOVE_NORMAL    0
-
-inline void SetThreadPriority(int nPriority)
-{
-    // It's unclear if it's even possible to change thread priorities on Linux,
-    // but we really and truly need it for the generation threads.
-#ifdef PRIO_THREAD
-    setpriority(PRIO_THREAD, 0, nPriority);
-#else
-    setpriority(PRIO_PROCESS, 0, nPriority);
-#endif
-}
-#endif
-
+void SetThreadPriority(int nPriority);
 void RenameThread(const char* name);
 
 inline uint32_t ByteReverse(uint32_t value)
