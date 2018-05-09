@@ -11,11 +11,12 @@ QMainWindow {
 }
 
 QProgressBar {
-background-color: #e8e8e8;
+	background-color: #e8e8e8;
 	border: 1px solid grey;
 	border-radius: 7px;
 	padding: 1px;
 	text-align: center;
+	color: #000829;
 }
 
 QProgressBar::chunk {
@@ -55,6 +56,11 @@ QToolBar > QToolButton:checked,
 QToolBar > QToolButton:hover {
 	color: #fff;
 	background: #000829;
+}
+
+QMenu::item:disabled {
+	background-color:#AAA;
+	color: #333;
 }
 
 QFrame {
@@ -148,13 +154,17 @@ QTableView::item {
 QTableView::item:selected {
 	/* background: #333; */
 	border: 0;
-
 }
 
 QTableView, QTableWidget:focus, QTableView:focus { /* Remove focus outline */
 	outline:0;
 	background:transparent;
 	border:0;
+}
+
+QTableView QLineEdit{
+	background-color: #fff;
+	color: #333;
 }
 
 QTreeWidget { /* Tree Background */
