@@ -60,12 +60,12 @@ int ECDSA_SIG_recover_key_GFp(EC_KEY *eckey, ECDSA_SIG *ecsig, const unsigned ch
     if (!eckey) return 0;
 
     const BIGNUM *sig_r, *sig_s;
-    #if OPENSSL_VERSION_NUMBER > 0x1000ffffL
+#if OPENSSL_VERSION_NUMBER > 0x1000ffffL
     ECDSA_SIG_get0(ecsig, &sig_r, &sig_s);
-    #else
+#else
     sig_r = ecsig->r;
     sig_s = ecsig->s;
-    #endif
+#endif
 
     int ret = 0;
     BN_CTX *ctx = NULL;
@@ -215,12 +215,12 @@ bool CECKey::SignCompact(const uint256 &hash, unsigned char *p64, int &rec) {
     memset(p64, 0, 64);
 
     const BIGNUM *sig_r, *sig_s;
-    #if OPENSSL_VERSION_NUMBER > 0x1000ffffL
+#if OPENSSL_VERSION_NUMBER > 0x1000ffffL
     ECDSA_SIG_get0(sig, &sig_r, &sig_s);
-    #else
+#else
     sig_r = sig->r;
     sig_s = sig->s;
-    #endif
+#endif
 
     int nBitsR = BN_num_bits(sig_r);
     int nBitsS = BN_num_bits(sig_s);

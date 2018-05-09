@@ -351,7 +351,7 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
     else if(type == Receive)
     {
         // Generate a new address to associate with given label
-        WalletModel::UnlockContext ctx(walletModel->requestUnlock());
+        WalletModel::UnlockContext ctx(walletModel->requestUnlock(true));
 
         if(!ctx.isValid())
         {
@@ -377,7 +377,6 @@ QString AddressTableModel::addRow(const QString &type, const QString &label, con
     {
         return QString();
     }
-
 
     return QString::fromStdString(strAddress);
 }

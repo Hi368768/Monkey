@@ -116,10 +116,10 @@ public:
 
     enum EncryptionStatus
     {
-        Unencrypted,  // !wallet->IsCrypted()
-        Locked,       // wallet->IsCrypted() && wallet->IsLocked()
-        Unlocked,      // wallet->IsCrypted() && !wallet->IsLocked()
-        UnlockedForAnonymizationOnly    // wallet->IsCrypted() && !wallet->IsLocked() && wallet->fWalletUnlockAnonymizeOnly
+        Unencrypted,                 // !wallet->IsCrypted()
+        Locked,                      // wallet->IsCrypted() && wallet->IsLocked()
+        Unlocked,                    // wallet->IsCrypted() && !wallet->IsLocked()
+        UnlockedForAnonymizationOnly // wallet->IsCrypted() && !wallet->IsLocked() && wallet->fWalletUnlockAnonymizeOnly
     };
 
     OptionsModel *getOptionsModel();
@@ -137,6 +137,8 @@ public:
     CAmount getWatchUnconfirmedBalance() const;
     CAmount getWatchImmatureBalance() const;
     EncryptionStatus getEncryptionStatus() const;
+
+    void emitBalanceChanged(); // Force update of UI-elements even when no values have changed
 
     // Check address for validity
     bool validateAddress(const QString &address);
@@ -190,7 +192,7 @@ public:
         void CopyFrom(const UnlockContext& rhs);
     };
 
-    UnlockContext requestUnlock();
+    UnlockContext requestUnlock(bool relock = false);
 
     bool getPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const;
     void getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs);

@@ -141,11 +141,6 @@ bool CWallet::AddCScript(const CScript& redeemScript)
     return CWalletDB(strWalletFile).WriteCScript(Hash160(redeemScript), redeemScript);
 }
 
-// optional setting to unlock wallet for staking only
-// serves to disable the trivial sendmoney when OS account compromised
-// provides no real security
-bool fWalletUnlockStakingOnly = false;
-
 bool CWallet::LoadCScript(const CScript& redeemScript)
 {
     /* A sanity check was added in pull #3843 to avoid adding redeemScripts
@@ -210,10 +205,10 @@ bool CWallet::Unlock(const SecureString& strWalletPassphrase, bool anonymizeOnly
 {
     SecureString strWalletPassphraseFinal;
 
-    if(!IsLocked())
+    if (!IsLocked())
     {
-    fWalletUnlockAnonymizeOnly = anonymizeOnly;
-    return true;
+        fWalletUnlockAnonymizeOnly = anonymizeOnly;
+        return true;
     }
 
     strWalletPassphraseFinal = strWalletPassphrase;
@@ -225,17 +220,15 @@ bool CWallet::Unlock(const SecureString& strWalletPassphrase, bool anonymizeOnly
         LOCK(cs_wallet);
         BOOST_FOREACH(const MasterKeyMap::value_type& pMasterKey, mapMasterKeys)
         {
-            if(!crypter.SetKeyFromPassphrase(strWalletPassphraseFinal, pMasterKey.second.vchSalt, pMasterKey.second.nDeriveIterations, pMasterKey.second.nDerivationMethod))
+            if (!crypter.SetKeyFromPassphrase(strWalletPassphraseFinal, pMasterKey.second.vchSalt, pMasterKey.second.nDeriveIterations, pMasterKey.second.nDerivationMethod))
                 return false;
             if (!crypter.Decrypt(pMasterKey.second.vchCryptedKey, vMasterKey))
-                return false;
-            if (!CCryptoKeyStore::Unlock(vMasterKey))
-                return false;
-        break;
+                continue; // try another master key
+            if (CCryptoKeyStore::Unlock(vMasterKey)) {
+                fWalletUnlockAnonymizeOnly = anonymizeOnly;
+                return true;
+            }
         }
-
-    fWalletUnlockAnonymizeOnly = anonymizeOnly;
-    return true;
     }
     return false;
 }
@@ -2307,7 +2300,7 @@ bool CWallet::GetStakeWeightFromValue(const int64_t& nTime, const int64_t& nValu
 }
 
 bool CWallet::CreateTransaction(const vector<pair<CScript, int64_t> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey,
-                                int64_t& nFeeRet, int nSplitBlock, int32_t& nChangePos, std::string& strFailReason, const CCoinControl* coinControl,
+                                int64_t& nFeeRet, int nSplitBlock, std::string& strFailReason, const CCoinControl* coinControl,
                                 AvailableCoinsType coin_type, bool useIX)
 {
     if (nTransactionFee < MIN_TX_FEE)
@@ -2567,9 +2560,8 @@ bool CWallet::CreateTransaction(CScript scriptPubKey, int64_t nValue, std::strin
     // -- CreateTransaction won't place change between value and narr output.
     //    narration output will be for preceding output
 
-    int nChangePos;
     std::string strFailReason;
-    bool rv = CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, 1, nChangePos, strFailReason, coinControl);
+    bool rv = CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, 1, strFailReason, coinControl);
     if(!strFailReason.empty())
     {
         LogPrintf("CreateTransaction(): ERROR: %s\n", strFailReason);
@@ -2986,9 +2978,9 @@ string CWallet::SendMoney(CScript scriptPubKey, int64_t nValue, std::string& sNa
         LogPrintf("SendMoney() : %s", strError);
         return strError;
     }
-    if (fWalletUnlockStakingOnly)
+    if (fWalletUnlockAnonymizeOnly)
     {
-        string strError = _("Error: Wallet unlocked for staking only, unable to create transaction.");
+        string strError = _("Error: Wallet unlocked for anonymization and staking only, unable to create transaction.");
         LogPrintf("SendMoney() : %s", strError);
         return strError;
     }
