@@ -3,13 +3,8 @@ TARGET = Monkey-Qt
 VERSION = 2.0.1
 INCLUDEPATH += src src/json src/qt
 QT += core gui widgets network printsupport
-DEFINES += ENABLE_WALLET
-DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
-CONFIG += no_include_pwd
-CONFIG += thread
-CONFIG += widgets
-CONFIG += static
-CONFIG += openssl
+DEFINES += ENABLE_WALLET QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
+CONFIG += no_include_pwd thread widgets static openssl
 
 QMAKE_CXXFLAGS += -std=c++11
 
