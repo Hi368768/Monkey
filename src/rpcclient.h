@@ -3,8 +3,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef _BITCOINRPC_CLIENT_H_
-#define _BITCOINRPC_CLIENT_H_ 1
+#ifndef BITCOIN_RPCCLIENT_H
+#define BITCOIN_RPCCLIENT_H
 
 #include "json/json_spirit_reader_template.h"
 #include "json/json_spirit_utils.h"
@@ -14,4 +14,4 @@ int CommandLineRPC(int argc, char *argv[]);
 
 json_spirit::Array RPCConvertValues(const std::string &strMethod, const std::vector<std::string> &strParams);
 
-#endif
+#endif // BITCOIN_RPCCLIENT_H

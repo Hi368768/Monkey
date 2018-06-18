@@ -3147,11 +3147,6 @@ for example: alertnotify=echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.c
         <translation>正在載入位址資料...</translation>
     </message>
     <message>
-        <location line="-15"/>
-        <source>Error loading blkindex.dat</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Error loading wallet.dat: Wallet corrupted</source>
         <translation>載入檔案 wallet.dat 時發生錯誤: 錢包損毀了</translation>

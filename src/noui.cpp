@@ -8,8 +8,11 @@
 
 #include <string>
 
-static int noui_ThreadSafeMessageBox(const std::string& message, const std::string& caption, unsigned int style)
+static bool noui_ThreadSafeMessageBox(const std::string& message, const std::string& caption, unsigned int style)
 {
+    bool fSecure = style & CClientUIInterface::SECURE;
+    style &= ~CClientUIInterface::SECURE;
+
     std::string strCaption;
     // Check for usage of predefined caption
     switch (style) {
@@ -23,12 +26,13 @@ static int noui_ThreadSafeMessageBox(const std::string& message, const std::stri
         strCaption += _("Information");
         break;
     default:
-        strCaption += caption; // Use supplied caption
+        strCaption += caption; // Use supplied caption (can be empty)
     }
 
-    LogPrintf("%s: %s\n", caption, message);
+    if (!fSecure)
+        LogPrintf("%s: %s\n", strCaption, message);
     fprintf(stderr, "%s: %s\n", strCaption.c_str(), message.c_str());
-    return 4;
+    return false;
 }
 
 static bool noui_ThreadSafeAskFee(int64_t nFeeRequired, const std::string& strCaption)
@@ -36,14 +40,14 @@ static bool noui_ThreadSafeAskFee(int64_t nFeeRequired, const std::string& strCa
     return true;
 }
 
-static void noui_InitMessage(const std::string &message)
+static void noui_InitMessage(const std::string& message)
 {
     LogPrintf("init message: %s\n", message);
 }
 
 void noui_connect()
 {
-    // Connect bitcoind signal handlers
+    // Connect monkeyd signal handlers
     uiInterface.ThreadSafeMessageBox.connect(noui_ThreadSafeMessageBox);
     uiInterface.ThreadSafeAskFee.connect(noui_ThreadSafeAskFee);
     uiInterface.InitMessage.connect(noui_InitMessage);

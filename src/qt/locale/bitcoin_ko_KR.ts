@@ -3144,11 +3144,6 @@ for example: alertnotify=echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.c
         <translation>주소를 불러오는 중...</translation>
     </message>
     <message>
-        <location line="-15"/>
-        <source>Error loading blkindex.dat</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Error loading wallet.dat: Wallet corrupted</source>
         <translation>wallet.dat 불러오기 에러: 지갑 오류</translation>

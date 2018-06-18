@@ -8,8 +8,8 @@
 
 #include "core.h"
 #include "main.h"
-#include "activemasternode.h"
-#include "masternodeman.h"
+#include "masternode-active.h"
+#include "masternode-manager.h"
 
 
 class CDarkSendRelay
@@ -25,7 +25,7 @@ public:
 
     CDarkSendRelay();
     CDarkSendRelay(CTxIn& vinMasternodeIn, vector<unsigned char>& vchSigIn, int nBlockHeightIn, int nRelayTypeIn, CTxIn& in2, CTxOut& out2);
-    
+
     IMPLEMENT_SERIALIZE
     (
     	READWRITE(vinMasternode);

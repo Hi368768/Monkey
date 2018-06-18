@@ -61,13 +61,9 @@ Versions used in this release:
 
 Dependency Build Instructions: Ubuntu / Debian
 ----------------------------------------------
-sudo apt-get install build-essential libssl-dev libdbdev libboost-all-dev libqrencode-dev libgmp-dev
+sudo apt-get install build-essential libssl-dev libboost-all-dev libqrencode-dev libgmp-dev libminiupnpc-dev
 
 If using Boost 1.37, append -mt to the boost libraries in the makefile.
-
-miniupnpc
----------
-sudo apt-get install libminiupnpc-dev
 
 Berkeley DB
 -----------

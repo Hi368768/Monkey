@@ -165,6 +165,9 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "searchrawtransactions", 2 },
     { "searchrawtransactions", 3 },
     { "setstakesplitthreshold", 0 },
+    { "spork", 1 },
+    { "spork", 2 },
+    { "reorganize", 0 }
 };
 
 class CRPCConvertTable

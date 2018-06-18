@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = Monkey-Qt
-VERSION = 2.0.1
+VERSION = 2.1.2
 INCLUDEPATH += src src/json src/qt
 QT += core gui widgets network printsupport
 DEFINES += ENABLE_WALLET QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
@@ -71,6 +71,8 @@ macx {
     BOOST_INCLUDE_PATH = /usr/local/Cellar/boost/1.67.0_1/include
     EVENT_LIB_PATH = /usr/local/Cellar/libevent/2.1.8/lib
     GMP_LIB_PATH = /usr/local/Cellar/gmp/6.1.2_2/lib
+    QRENCODE_INCLUDE_PATH = /usr/local/Cellar/qrencode/4.0.0/include
+    QRENCODE_LIB_PATH = /usr/local/Cellar/qrencode/4.0.0/lib
 }
 
 !win32 {
@@ -195,7 +197,7 @@ PRE_TARGETDEPS += $$PWD/src/secp256k1/src/libsecp256k1_la-secp256k1.o
 QMAKE_EXTRA_TARGETS += gensecp256k1
 
 # Gross ugly hack that depends on qmake internals, unfortunately there is no other way to do it.
-# QMAKE_CLEAN += $$PWD/src/secp256k1/src/libsecp256k1_la-secp256k1.o; cd $$PWD/src/secp256k1; $(MAKE) clean
+QMAKE_CLEAN += $$PWD/src/secp256k1/src/libsecp256k1_la-secp256k1.o; cd $$PWD/src/secp256k1; $(MAKE) clean
 
 # regenerate src/build.h
 !windows|contains(USE_BUILD_INFO, 1) {
@@ -336,10 +338,11 @@ HEADERS += src/qt/bitcoingui.h \
     src/darksend.h \
     src/darksend-relay.h \
     src/instantx.h \
-    src/activemasternode.h \
+    src/masternode-active.h \
     src/masternodeconfig.h \
-    src/masternodeman.h \
+    src/masternode-manager.h \
     src/masternode-payments.h \
+    src/masternode-sync.h \
     src/spork.h \
     src/crypto/common.h \
     src/crypto/hmac_sha256.h \
@@ -348,7 +351,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/crypto/sha1.h \
     src/crypto/sha256.h \
     src/crypto/sha512.h \
-    src/qt/masternodemanager.h \
+    src/qt/masternodelist.h \
     src/qt/addeditmasternode.h \
     src/qt/masternodeconfigdialog.h \
     src/qt/qvalidatedtextedit.h \
@@ -364,7 +367,14 @@ HEADERS += src/qt/bitcoingui.h \
     src/crypto/sph_simd.h \
     src/crypto/sph_skein.h \
     src/crypto/sph_types.h \
-    src/limitedmap.h
+    src/limitedmap.h \
+    src/qt/platformstyle.h \
+    src/qt/peertablemodel.h \
+    src/qt/networkstyle.h \
+    src/qt/utilitydialog.h \
+    src/qt/splashscreen.h \
+    src/streams.h \
+    src/qt/winshutdownmonitor.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \
@@ -381,8 +391,9 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/alert.cpp \
     src/allocators.cpp \
     src/base58.cpp \
+    src/uint256.cpp \
     src/chainparams.cpp \
-    src/version.cpp \
+    src/clientversion.cpp \
     src/sync.cpp \
     src/txmempool.cpp \
     src/util.cpp \
@@ -448,11 +459,12 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/masternode.cpp \
     src/darksend.cpp \
     src/darksend-relay.cpp \
-    src/rpcdarksend.cpp \
+    src/rpcmasternode.cpp \
     src/instantx.cpp \
-    src/activemasternode.cpp \
-    src/masternodeman.cpp \
+    src/masternode-active.cpp \
+    src/masternode-manager.cpp \
     src/masternode-payments.cpp \
+    src/masternode-sync.cpp \
     src/spork.cpp \
     src/masternodeconfig.cpp \
     src/crypto/hmac_sha256.cpp \
@@ -461,10 +473,16 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/crypto/sha1.cpp \
     src/crypto/sha256.cpp \
     src/crypto/sha512.cpp \
-    src/qt/masternodemanager.cpp \
+    src/qt/masternodelist.cpp \
     src/qt/addeditmasternode.cpp \
     src/qt/masternodeconfigdialog.cpp \
-    src/qt/qvalidatedtextedit.cpp
+    src/qt/qvalidatedtextedit.cpp \
+    src/qt/platformstyle.cpp \
+    src/qt/peertablemodel.cpp \
+    src/qt/networkstyle.cpp \
+    src/qt/utilitydialog.cpp \
+    src/qt/splashscreen.cpp \
+    src/qt/winshutdownmonitor.cpp
 
 RESOURCES += \
     src/qt/bitcoin.qrc
@@ -483,9 +501,10 @@ FORMS += \
     src/qt/forms/rpcconsole.ui \
     src/qt/forms/optionsdialog.ui \
     src/qt/forms/darksendconfig.ui \
-    src/qt/forms/masternodemanager.ui \
+    src/qt/forms/masternodelist.ui \
     src/qt/forms/addeditmasternode.ui \
-    src/qt/forms/masternodeconfigdialog.ui
+    src/qt/forms/masternodeconfigdialog.ui \
+    src/qt/forms/helpmessagedialog.ui
 
 contains(USE_QRCODE, 1) {
     HEADERS += src/qt/qrcodedialog.h
@@ -543,6 +562,7 @@ contains(USE_UPNP, -) {
 
 windows:DEFINES += WIN32
 windows:RC_FILE = src/qt/res/bitcoin-qt.rc
+windows:QMAKE_RC = i686-w64-mingw32.static-windres -DWINDRES_PREPROC
 
 windows:!contains(MINGW_THREAD_BUGFIX, 0) {
     # At least qmake's win32-g++-cross profile is missing the -lmingwthrd
@@ -594,3 +614,4 @@ contains(RELEASE, 1) {
 }
 
 system($$QMAKE_LRELEASE -silent $$_PRO_FILE_)
+

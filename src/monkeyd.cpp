@@ -7,7 +7,7 @@
 #include "rpcclient.h"
 #include "init.h"
 #include <boost/algorithm/string/predicate.hpp>
-
+#include "masternodeconfig.h"
 
 void WaitForShutdown(boost::thread_group* threadGroup)
 {
@@ -57,7 +57,7 @@ bool AppInit(int argc, char* argv[])
 
         if (mapArgs.count("-?") || mapArgs.count("--help"))
         {
-            // First part of help message is specific to bitcoind / RPC client
+            // First part of help message is specific to monkeyd / RPC client
             std::string strUsage = _("Monkey version") + " " + FormatFullVersion() + "\n\n" +
                 _("Usage:") + "\n" +
                   "  monkeyd [options]                     " + "\n" +
@@ -68,6 +68,13 @@ bool AppInit(int argc, char* argv[])
             strUsage += "\n" + HelpMessage();
 
             fprintf(stdout, "%s", strUsage.c_str());
+            return false;
+        }
+
+        // parse masternode.conf
+        std::string strErr;
+        if (!masternodeConfig.read(strErr)) {
+            fprintf(stderr, "Error reading masternode configuration file: %s\n", strErr.c_str());
             return false;
         }
 
@@ -136,7 +143,7 @@ int main(int argc, char* argv[])
 {
     bool fRet = false;
 
-    // Connect bitcoind signal handlers
+    // Connect monkeyd signal handlers
     noui_connect();
 
     fRet = AppInit(argc, argv);

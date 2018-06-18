@@ -12,10 +12,12 @@
 #include "mruset.h"
 #include "netbase.h"
 #include "protocol.h"
+#include "streams.h"
 #include "sync.h"
 #include "uint256.h"
 #include "util.h"
 
+#include <atomic>
 #include <deque>
 #include <stdint.h>
 
@@ -109,19 +111,22 @@ void SetReachable(enum Network net, bool fFlag = true);
 CAddress GetLocalAddress(const CNetAddr *paddrPeer = NULL);
 
 
-enum {
-    MSG_TX = 1,
-    MSG_BLOCK,
-    // Nodes may always request a MSG_FILTERED_BLOCK in a getdata, however,
-    // MSG_FILTERED_BLOCK should not appear in any invs except as a part of getdata.
-    MSG_FILTERED_BLOCK,
-    MSG_TXLOCK_REQUEST,
-    MSG_TXLOCK_VOTE,
-    MSG_SPORK,
-    MSG_MASTERNODE_WINNER,
-    MSG_MASTERNODE_SCANNING_ERROR,
-    MSG_DSTX
-};
+// enum {
+//     MSG_TX = 1,
+//     MSG_BLOCK,
+//     // Nodes may always request a MSG_FILTERED_BLOCK in a getdata, however,
+//     // MSG_FILTERED_BLOCK should not appear in any invs except as a part of getdata.
+//     MSG_FILTERED_BLOCK,
+//     MSG_TXLOCK_REQUEST,
+//     MSG_TXLOCK_VOTE,
+//     MSG_SPORK,
+//     MSG_MASTERNODE_WINNER,
+//     MSG_MASTERNODE_SCANNING_ERROR,
+//     MSG_MASTERNODE_QUORUM,
+//     MSG_MASTERNODE_ANNOUNCE,
+//     MSG_MASTERNODE_PING,
+//     MSG_DSTX
+// };
 
 extern bool fDiscover;
 extern uint64_t nLocalServices;
@@ -258,9 +263,14 @@ public:
     // b) the peer may tell us in their version message that we should not relay tx invs
     //    until they have initialized their bloom filter.
     bool fRelayTxes;
+    // Should be 'true' only if we connected to this node to actually mix funds.
+    // In this case node will be released automatically via CMasternodeMan::ProcessMasternodeConnections().
+    // Connecting to verify connectability/status or connecting for sending/relaying single message
+    // (even if it's relative to mixing e.g. for blinding) should NOT set this to 'true'.
+    // For such cases node should be released manually (preferably right after corresponding code).
     bool fDarkSendMaster;
     CSemaphoreGrant grantOutbound;
-    int nRefCount;
+    std::atomic<int> nRefCount;
     NodeId id;
 protected:
 
@@ -381,7 +391,7 @@ public:
 
     int GetRefCount()
     {
-        assert(nRefCount >= 0);
+        // assert(nRefCount >= 0);
         return nRefCount;
     }
 
@@ -497,7 +507,7 @@ public:
         ENTER_CRITICAL_SECTION(cs_vSend);
         assert(ssSend.size() == 0);
         ssSend << CMessageHeader(pszCommand, 0);
-        LogPrint("net", "sending: %s ", pszCommand);
+        LogPrint("net", "sending: %s\n", pszCommand);
     }
 
     // TODO: Document the precondition of this function.  Is cs_vSend locked?
@@ -767,18 +777,29 @@ template<typename T1, typename T2, typename T3, typename T4, typename T5, typena
         return false;
     }
 
+    void ClearFulfilledRequest(std::string strRequest)
+    {
+        std::vector<std::string>::iterator it = vecRequestsFulfilled.begin();
+        while (it != vecRequestsFulfilled.end()) {
+            if ((*it) == strRequest) {
+                vecRequestsFulfilled.erase(it);
+                return;
+            }
+            ++it;
+        }
+    }
+
     void FulfilledRequest(std::string strRequest)
     {
         if(HasFulfilledRequest(strRequest)) return;
         vecRequestsFulfilled.push_back(strRequest);
     }
 
-
     bool IsSubscribed(unsigned int nChannel);
     void Subscribe(unsigned int nChannel, unsigned int nHops=0);
     void CancelSubscribe(unsigned int nChannel);
     void CloseSocketDisconnect();
-
+    bool DisconnectOldProtocol(int nVersionRequired, std::string strLastCommand = "");
 
     // Denial-of-service detection/prevention
     // The idea is to detect peers that are behaving
@@ -807,20 +828,17 @@ template<typename T1, typename T2, typename T3, typename T4, typename T5, typena
     static uint64_t GetTotalBytesSent();
 };
 
-inline void RelayInventory(const CInv& inv)
+class CExplicitNetCleanup
 {
-    // Put on lists to offer to the other nodes
-    {
-        LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes)
-            pnode->PushInventory(inv);
-    }
-}
+public:
+    static void callCleanup();
+};
 
 class CTransaction;
 void RelayTransaction(const CTransaction& tx, const uint256& hash);
 void RelayTransaction(const CTransaction& tx, const uint256& hash, const CDataStream& ss);
 void RelayTransactionLockReq(const CTransaction& tx, bool relayToAll=false);
+void RelayInventory(const CInv& inv);
 
 /** Access to the (IP) address database (peers.dat) */
 class CAddrDB

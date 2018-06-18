@@ -3165,11 +3165,6 @@ rpcpassword=%s
         <translation>アドレスを読み込んでいます...</translation>
     </message>
     <message>
-        <location line="-15"/>
-        <source>Error loading blkindex.dat</source>
-        <translation>blkindex.dat 読み込みエラー</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Error loading wallet.dat: Wallet corrupted</source>
         <translation>wallet.dat 読み込みエラー: ウォレットが壊れました</translation>

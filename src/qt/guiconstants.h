@@ -10,6 +10,8 @@ static const int MAX_PASSPHRASE_SIZE = 1024;
 /* BitcoinGUI -- Size of icons in status bar */
 static const int STATUSBAR_ICONSIZE = 16;
 
+static const bool DEFAULT_SPLASHSCREEN = true;
+
 /* Invalid field background style */
 #define STYLE_INVALID "background:#FF8080"
 
@@ -19,6 +21,12 @@ static const int STATUSBAR_ICONSIZE = 16;
 #define COLOR_NEGATIVE QColor(255, 92, 92)
 /* Transaction list -- bare address (without label) */
 #define COLOR_BAREADDRESS QColor(240, 240, 240)
+/* Transaction list -- TX status decoration - open until date */
+#define COLOR_TX_STATUS_OPENUNTILDATE QColor(64, 64, 255)
+/* Transaction list -- TX status decoration - offline */
+#define COLOR_TX_STATUS_OFFLINE QColor(192, 192, 192)
+/* Transaction list -- TX status decoration - default color */
+#define COLOR_BLACK QColor(51, 51, 51)
 /* Transaction list - white color */
 #define COLOR_WHITE QColor(255, 255, 255)
 
@@ -32,5 +40,10 @@ static const int MAX_URI_LENGTH = 255;
 
 /* QRCodeDialog -- size of exported QR Code image */
 #define EXPORT_IMAGE_SIZE 256
+
+#define QAPP_ORG_NAME "Monkey"
+#define QAPP_ORG_DOMAIN "monkey.vision"
+#define QAPP_APP_NAME_DEFAULT "Monkey-Qt"
+#define QAPP_APP_NAME_TESTNET "Monkey-Qt-testnet"
 
 #endif // GUICONSTANTS_H

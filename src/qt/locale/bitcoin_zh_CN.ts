@@ -3176,11 +3176,6 @@ alertnotify=echo %%s | mail -s &quot;monkey Alert&quot; admin@foo.com
         <translation>正在加载地址簿...</translation>
     </message>
     <message>
-        <location line="-15"/>
-        <source>Error loading blkindex.dat</source>
-        <translation>blkindex.dat 文件加载出错</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Error loading wallet.dat: Wallet corrupted</source>
         <translation>wallet.dat 钱包文件加载出错：钱包损坏</translation>

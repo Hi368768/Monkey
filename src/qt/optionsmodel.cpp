@@ -117,6 +117,8 @@ void OptionsModel::Init()
         settings.setValue("language", "");
     if (!SoftSetArg("-lang", settings.value("language").toString().toStdString()))
         addOverriddenOption("-lang");
+    if (!settings.contains("digits"))
+        settings.setValue("digits", "2");
 
     language = settings.value("language").toString();
 }
@@ -190,6 +192,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
 #endif
         case DisplayUnit:
             return nDisplayUnit;
+        case Digits:
+            return settings.value("digits");
         case Language:
             return settings.value("language");
         case CoinControlFeatures:
@@ -285,6 +289,12 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             nDisplayUnit = value.toInt();
             settings.setValue("nDisplayUnit", nDisplayUnit);
             emit displayUnitChanged(nDisplayUnit);
+            break;
+        case Digits:
+            if (settings.value("digits") != value) {
+                settings.setValue("digits", value);
+                setRestartRequired(true);
+            }
             break;
         case Language:
             if (settings.value("language") != value) {

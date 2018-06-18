@@ -377,8 +377,11 @@ CNode* FindNode(const CService& addr)
 
 CNode* ConnectNode(CAddress addrConnect, const char *pszDest, bool darkSendMaster)
 {
-    if (pszDest == NULL) {
-        if (IsLocal(addrConnect))
+    if (pszDest == NULL)
+    {
+        // we clean masternode connections in CMasternodeMan::ProcessMasternodeConnections()
+        // so should be safe to skip this and connect to local Hot MN on CActiveMasternode::ManageStatus()
+        if (IsLocal(addrConnect) && !darkSendMaster)
             return NULL;
 
         // Look for an existing connection
@@ -386,13 +389,12 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest, bool darkSendMaste
         if (pnode)
         {
             if(darkSendMaster)
-                pnode->fDarkSendMaster = true;
+                pnode->fDarkSendMaster = darkSendMaster;
 
             pnode->AddRef();
             return pnode;
         }
     }
-
 
     /// debug print
     LogPrint("net", "trying connection %s lastseen=%.1fhrs\n",
@@ -455,7 +457,17 @@ void CNode::CloseSocketDisconnect()
         pnodeSync = NULL;
 }
 
+bool CNode::DisconnectOldProtocol(int nVersionRequired, string strLastCommand)
+{
+    fDisconnect = false;
+    if (nVersion < nVersionRequired) {
+        LogPrintf("%s : peer=%d using obsolete version %i; disconnecting\n", __func__, id, nVersion);
+        PushMessage("reject", strLastCommand, REJECT_OBSOLETE, strprintf("Version must be %d or greater", ActiveProtocol()));
+        fDisconnect = true;
+    }
 
+    return fDisconnect;
+}
 
 void CNode::PushVersion()
 {
@@ -693,7 +705,7 @@ void ThreadSocketHandler()
             LOCK(cs_vNodes);
             // Disconnect unused nodes
             vector<CNode*> vNodesCopy = vNodes;
-            BOOST_FOREACH(CNode* pnode, vNodesCopy)
+            for (CNode* pnode : vNodesCopy)
             {
                 if (pnode->fDisconnect ||
                     (pnode->GetRefCount() <= 0 && pnode->vRecvMsg.empty() && pnode->nSendSize == 0 && pnode->ssSend.empty()))
@@ -992,7 +1004,7 @@ void ThreadSocketHandler()
         }
         {
             LOCK(cs_vNodes);
-            BOOST_FOREACH(CNode* pnode, vNodesCopy)
+            for (CNode* pnode : vNodesCopy)
                 pnode->Release();
         }
     }
@@ -1512,7 +1524,7 @@ void ThreadMessageHandler()
 
         {
             LOCK(cs_vNodes);
-            BOOST_FOREACH(CNode* pnode, vNodesCopy)
+            for (CNode* pnode : vNodesCopy)
                 pnode->Release();
         }
 
@@ -1780,11 +1792,13 @@ public:
 }
 instance_of_cnetcleanup;
 
-
-
-
-
-
+void CExplicitNetCleanup::callCleanup()
+{
+    // Explicit call to destructor of CNetCleanup because it's not implicitly called
+    // when the wallet is restarted from within the wallet itself.
+    CNetCleanup* tmp = new CNetCleanup();
+    delete tmp; // Stroustrup's gonna kill me for that
+}
 
 void RelayTransaction(const CTransaction& tx, const uint256& hash)
 {
@@ -1820,14 +1834,25 @@ void RelayTransactionLockReq(const CTransaction& tx, bool relayToAll)
 
     //broadcast the new lock
     LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
+    for (CNode* pnode : vNodes)
     {
         if(!relayToAll && !pnode->fRelayTxes)
             continue;
 
-        pnode->PushMessage("txlreq", tx);
+        pnode->PushMessage("ix", tx);
     }
+}
 
+void RelayInventory(const CInv& inv)
+{
+    // Put on lists to offer to the other nodes
+    LOCK(cs_vNodes);
+    BOOST_FOREACH (CNode* pnode, vNodes){
+        if((pnode->nServices == NODE_BLOOM_WITHOUT_MN) && inv.IsMasterNodeType())
+            continue;
+        if (pnode->nVersion >= ActiveProtocol())
+            pnode->PushInventory(inv);
+    }
 }
 
 void CNode::RecordBytesRecv(uint64_t bytes)

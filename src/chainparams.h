@@ -63,7 +63,8 @@ public:
     virtual const CBlock& GenesisBlock() const = 0;
     virtual bool RequireRPCPassword() const { return true; }
     const string& DataDir() const { return strDataDir; }
-    virtual Network NetworkID() const = 0;
+    /** Return the BIP70 network string (main, test or regtest) */
+    std::string NetworkIDString() const { return strNetworkID; }
     const vector<CDNSSeedData>& DNSSeeds() const { return vSeeds; }
     const std::vector<unsigned char> &Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
     virtual const vector<CAddress>& FixedSeeds() const = 0;
@@ -71,9 +72,13 @@ public:
     int EndPoWBlock() const { return nEndPoWBlock; }
     int StartPoSBlock() const { return nStartPoSBlock; }
     int PoolMaxTransactions() const { return nPoolMaxTransactions; }
+    std::string SporkKey() const { return strSporkKey; }
     std::string DarksendPoolDummyAddress() const { return strDarksendPoolDummyAddress; }
     unsigned int StakeMinAge() const { return nStakeMinAge; }
     unsigned int StakeMaxAge() const;
+    CChainParams::Network NetworkID() const { return networkID; }
+    /** The masternode count that we will allow the see-saw reward payments to be off by */
+    int MasternodeCountDrift() const { return nMasternodeCountDrift; }
 protected:
     CChainParams() {};
 
@@ -89,15 +94,19 @@ protected:
     string strDataDir;
     vector<CDNSSeedData> vSeeds;
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
+    CChainParams::Network networkID;
+    std::string strNetworkID;
     int nEndPoWBlock;
     int nStartPoSBlock;
     int nPoolMaxTransactions;
+    std::string strSporkKey;
     std::string strDarksendPoolDummyAddress;
     /** Minimum nCoinAge required to stake PoS */
     unsigned int nStakeMinAge;
     /** Maximum nCoinAge required to stake PoS */
     unsigned int nStakeMaxAge;
     unsigned int nStakeMaxAgeV2;
+    int nMasternodeCountDrift;
 };
 
 /**
@@ -105,6 +114,9 @@ protected:
  * outside of the unit tests.
  */
 const CChainParams &Params();
+
+/** Return parameters for the given network. */
+CChainParams& Params(CChainParams::Network network);
 
 /** Sets the params returned by Params() to those for the given network. */
 void SelectParams(CChainParams::Network network);

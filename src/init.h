@@ -16,7 +16,11 @@ void StartShutdown();
 bool ShutdownRequested();
 void Shutdown();
 bool AppInit2(boost::thread_group& threadGroup);
-std::string HelpMessage();
 extern bool fOnlyTor;
+
+/** Help for options shared between UI and daemon (for -help) */
+std::string HelpMessage();
+/** Returns licensing information (for -version) */
+std::string LicenseInfo();
 
 #endif

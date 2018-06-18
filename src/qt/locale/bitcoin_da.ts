@@ -3171,11 +3171,6 @@ for eksempel: alertnotify = echo%% s | mail-s &quot;monkey Alert&quot; admin@foo
         <translation>Indlæser adresser...</translation>
     </message>
     <message>
-        <location line="-15"/>
-        <source>Error loading blkindex.dat</source>
-        <translation>Fejl ved indlæsning af blkindex.dat</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Error loading wallet.dat: Wallet corrupted</source>
         <translation>Fejl ved indlæsning af wallet.dat: Tegnebog ødelagt</translation>

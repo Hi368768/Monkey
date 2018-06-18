@@ -3158,11 +3158,6 @@ Executar una ordre quan es rep un avís rellevant (%s en cmd es substitueix per 
         <translation>Carregant adreces...</translation>
     </message>
     <message>
-        <location line="-15"/>
-        <source>Error loading blkindex.dat</source>
-        <translation>Error carregant blkindex.dat</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Error loading wallet.dat: Wallet corrupted</source>
         <translation>Error carregant wallet.dat: Moneder corrupte</translation>

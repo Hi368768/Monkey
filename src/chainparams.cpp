@@ -43,7 +43,11 @@ static void convertSeed6(std::vector<CAddress> &vSeedsOut, const SeedSpec6 *data
 //
 class CMainParams : public CChainParams {
 public:
-    CMainParams() {
+    CMainParams()
+    {
+        networkID = CChainParams::MAIN;
+        strNetworkID = "main";
+
         // The message start string is designed to be unlikely to occur in normal data.
         // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
         // a large 4-byte int at any alignment.
@@ -52,7 +56,7 @@ public:
         pchMessageStart[2] = 0xc5;
         pchMessageStart[3] = 0x2b;
 
-        vAlertPubKey = ParseHex("04B4E3C86CBB37515D61852F3F08E665324EE2513255EE69E3EB171A4F7A9D23CE56BD23352F6538B2855E0916A09AEBDF4B661CFA919FC726F3BB63EC62619FFB");
+        vAlertPubKey = ParseHex("04f35675a3f24fd836bec1735d65b0dbc7f8cd491423ef50cdb9e1aab39721d4a752d9777be7d699e26f4c6db186e883c87b2fad0428ae216faf5bed61cf8d317f");
         nDefaultPort = 8710;
         nRPCPort = 8101;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20);
@@ -104,6 +108,7 @@ public:
         convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
 
         nPoolMaxTransactions = 3;
+        strSporkKey = "0431a3e4fcb29011df5ac2e47e0da085f9378c7de8174cf9b7ccd8959235c4be2be224b5880c6036c5f7718c12c988c39db7f2af0e392748cca23726a4cfd97815";
         strDarksendPoolDummyAddress = "Mgn67cAEbNSs6Ajfq52HzNMbdtsxV9XHxL";
         nEndPoWBlock = 75000;
         nStartPoSBlock = 0;
@@ -111,10 +116,11 @@ public:
         nStakeMinAge = 8 * 60 * 60; // 8 hours
         nStakeMaxAge = 2 * 24 * 60 * 60; // 48 hours
         nStakeMaxAgeV2 =  10 * 24 * 60 * 60; // 240 hours
+
+        nMasternodeCountDrift = 20;
     }
 
     virtual const CBlock& GenesisBlock() const { return genesis; }
-    virtual Network NetworkID() const { return CChainParams::MAIN; }
 
     virtual const vector<CAddress>& FixedSeeds() const {
         return vFixedSeeds;
@@ -131,17 +137,17 @@ static CMainParams mainParams;
 //
 class CTestNetParams : public CMainParams {
 public:
-    CTestNetParams() {
-        // The message start string is designed to be unlikely to occur in normal data.
-        // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
-        // a large 4-byte int at any alignment.
+    CTestNetParams()
+    {
+        networkID = CChainParams::TESTNET;
+        strNetworkID = "test";
         pchMessageStart[0] = 0x2c;
         pchMessageStart[1] = 0xab;
         pchMessageStart[2] = 0x21;
         pchMessageStart[3] = 0xc3;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 16);
         bnProofOfStakeLimit = CBigNum(~uint256(0) >> 20);
-        vAlertPubKey = ParseHex("049236256689E39E7323C4BC92FBDCA9EC8C2D115B96B2BCC55F87A857E59D48B1C3654F5F6F0257399E69ED1F3D08DCE555DD421EA4570B119C92C038DA083956");
+        vAlertPubKey = ParseHex("0434ff6edbff4e2b6b1474e80c4436f5b266e292fd203fc8425c788688f96e89975c4ba08fb160181b56048d560e83b5ea8ac118a29f9d3b9f4ab90a6de23a817f");
         nDefaultPort = 8711;
         nRPCPort = 8102;
         strDataDir = "testnet";
@@ -171,10 +177,12 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = list_of(0x04)(0x35)(0x87)(0xCF).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = list_of(0x04)(0x35)(0x83)(0x94).convert_to_container<std::vector<unsigned char> >();
 
-        nEndPoWBlock = 0x7fffffff;
+        nEndPoWBlock = 1000;
         nStakeMinAge = 20 * 60; // 20 mins
+
+        nMasternodeCountDrift = 4;
+        strSporkKey = "04bae79cbfbcc3c555643d371388bd02ade4c8b09d1529e191aa6e06becd4d3ab0fde31d320704d1bc6d5e33b107335aa41e3a89eec6b0dfce015c9ab37eee966c";
     }
-    virtual Network NetworkID() const { return CChainParams::TESTNET; }
 };
 static CTestNetParams testNetParams;
 
@@ -183,7 +191,10 @@ static CTestNetParams testNetParams;
 //
 class CRegTestParams : public CTestNetParams {
 public:
-    CRegTestParams() {
+    CRegTestParams()
+    {
+        networkID = CChainParams::REGTEST;
+        strNetworkID = "regtest";
         pchMessageStart[0] = 0x42;
         pchMessageStart[1] = 0xa4;
         pchMessageStart[2] = 0xc5;
@@ -218,6 +229,21 @@ static CChainParams *pCurrentParams = &mainParams;
 
 const CChainParams &Params() {
     return *pCurrentParams;
+}
+
+CChainParams& Params(CChainParams::Network network)
+{
+    switch (network) {
+    case CChainParams::MAIN:
+        return mainParams;
+    case CChainParams::TESTNET:
+        return testNetParams;
+    case CChainParams::REGTEST:
+        return regTestParams;
+    default:
+        assert(false && "Unimplemented network");
+        return mainParams;
+    }
 }
 
 void SelectParams(CChainParams::Network network) {

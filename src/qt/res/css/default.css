@@ -1,13 +1,15 @@
 * {
 	font-family: Lato;
 	font-size: 14px;
-	color: #ffffff;
+	outline: none;
+	/* color: #ffffff;÷ */
 }
 
 QMainWindow {
 	border-image: url(:/images/wallet_frame) 0 0 0 0 stretch stretch;
 	border-top: 0px solid #000;
 	border:none;
+	color: #fff;
 }
 
 QProgressBar {
@@ -75,8 +77,18 @@ QStatusBar QFrame {
 }
 
 QLabel#labelBalances,
-QLabel#labelDarksend,
-QLabel#labelTransactions {
+QLabel#labelBalanceText, QLabel#labelBalance,
+QLabel#labelImmatureText, QLabel#labelImmature,
+QLabel#labelPendingText, QLabel#labelUnconfirmed,
+QLabel#labelStakeText, QLabel#labelStake,
+QLabel#labelTotal, QLabel#labelTotalText,
+QLabel#labelDarksend, QLabel#labelStatusText,
+QLabel#darksendEnabled, QLabel#labelCompletitionText,
+QLabel#labelAnonymizedText, QLabel#labelAnonymized,
+QLabel#labelAmountRoundsText, QLabel#labelAmountRounds,
+QLabel#labelSubmittedDenomText, QLabel#labelSubmittedDenom,
+QLabel#darksendStatus, QLabel#labelTransactions,
+QLabel#labelCoinControlFeatures {
 	color: #fff;
 	padding: 2px;
 	font-size: 16px;
@@ -87,6 +99,23 @@ QLabel#labelDarksendSyncStatus
 QLabel#labelTransactionsStatus {
 	padding: 2px;
 }
+
+QLabel#labelBalanceText, QLabel#labelCoinControlAutomaticallySelected,
+QLabel#labelCoinControlQuantityText, QLabel#labelCoinControlQuantity,
+QLabel#labelCoinControlBytesText, QLabel#labelCoinControlBytes,
+QLabel#labelCoinControlAmountText, QLabel#labelCoinControlAmount,
+QLabel#labelCoinControlPriorityText, QLabel#labelCoinControlPriority,
+QLabel#labelCoinControlFeeText, QLabel#labelCoinControlFee,
+QLabel#labelCoinControlLowOutputText, QLabel#labelCoinControlLowOutput,
+QLabel#labelCoinControlAfterFeeText, QLabel#labelCoinControlAfterFee,
+QLabel#labelCoinControlChangeText, QLabel#labelCoinControlChange,
+QLabel#labelBlockSizeText, QLabel#labelBlockSize,
+QLabel#amountLabel, QLabel#labelLabel, QLabel#payToLabel,
+QLabel#labelMasternodeNote, QLabel#labelAutoUpdate, QLabel#labelAutoUpdateSeconds {
+	color: #fff;
+}
+
+
 
 QPushButton {
 	background-color: #fff;
@@ -103,6 +132,7 @@ QPushButton {
 	padding-bottom: 1px;
 	height: 26px;
 	margin: 2px;
+	outline: none;
 }
 
 QPushButton:pressed,
@@ -125,14 +155,6 @@ QWidget#scrollAreaWidgetContents {
 	background: transparent;
 }
 
-QLabel {
-	color: #fff;
-}
-
-QDialog > .QLabel {
-	color: #fff;
-}
-
 QFrame#SendCoinsEntry, QFrame#frameCoinControl {
 	background: rgba(255, 255, 255, 20%);
 	border-bottom: 1px solid #fff;
@@ -152,7 +174,8 @@ QTableView::item {
 }
 
 QTableView::item:selected {
-	/* background: #333; */
+	background: #0069D9;
+	color: #fff;
 	border: 0;
 }
 
@@ -162,7 +185,7 @@ QTableView, QTableWidget:focus, QTableView:focus { /* Remove focus outline */
 	border:0;
 }
 
-QTableView QLineEdit{
+QTableView QLineEdit {
 	background-color: #fff;
 	color: #333;
 }
@@ -262,9 +285,19 @@ QComboBox::indicator {
 }
 
 /* Dialog */
-QDialog {
+QDialog#AboutDialog,
+QDialog#AskPassphraseDialog,
+QDialog#CoinControlDialog,
+QDialog#EditAddressDialog,
+QDialog#OptionsDialog,
+QDialog#RPCConsole,
+QDialog#RPCConsole {
 	background: #000829;
 	border: 2px solid #fff;
+}
+
+QDialog .QTabWidget .QLabel {
+	color: #fff;
 }
 
 QDialog .QTabWidget {
@@ -302,6 +335,7 @@ QDialog .QTabWidget QTabBar::tab:hover {
 
 QDialog .QTabWidget .QWidget {
 	background: #000829;
+	outline:0; /* Remove Annoying Focus Rectangle */
 }
 
 QDialog .QTabWidget .QWidget QAbstractSpinBox {
@@ -314,6 +348,21 @@ QDialog .QTabWidget .QWidget QAbstractSpinBox::down-button {
 
 QDialog .QTabWidget .QWidget QAbstractSpinBox::up-button {
 	width:15px;
+}
+
+QDialog .QTabWidget .QWidget QComboBox {
+	min-height:15px;
+}
+
+QDialog#AboutDialog > QLabel,
+QDialog#AddressBookPage > QLabel,
+QDialog#AskPassphraseDialog > QLabel,
+QDialog#CoinControlDialog > QLabel,
+QDialog#EditAddressDialog > QLabel,
+QDialog#OptionsDialog QLabel,
+QDialog#RPCConsole > QLabel,
+QDialog#RPCConsole > QLabel {
+	color: #fff;
 }
 
 QAbstractSpinBox {
@@ -367,10 +416,6 @@ QSpinBox::up-button:hover {
 
 QSpinBox::down-button:hover {
 	background-color: #f2f2f2;
-}
-
-QDialog .QTabWidget .QWidget QComboBox {
-	min-height:15px;
 }
 
 /* Overview right column */
@@ -465,4 +510,32 @@ QAbstractItemView#completerPopup::item
 {
 	padding-top: 2px;
 	padding-bottom: 2px;
+}
+
+QAbstractButton
+{
+	outline: none;
+}
+
+QCheckBox {
+	color: #ffffff;
+	border-color: #fff;
+}
+
+QRadioButton {
+	color: #ffffff;
+}
+
+QDialog#CoinControlDialog .QFrame#frame .QRadioButton#radioTreeMode { /* Coin Control Tree Mode Selector */
+	color:#fff;
+	background-color:transparent;
+}
+
+QDialog#CoinControlDialog .QFrame#frame .QRadioButton#radioListMode { /* Coin Control List Mode Selector */
+	color:#fff;
+	background-color:transparent;
+}
+
+QGroupBox#networkGroupBox {
+	color: #fff;
 }

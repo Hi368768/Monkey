@@ -87,7 +87,6 @@ int nAnonymizeMonkeyAmount = 1000;
 int nLiquidityProvider = 0;
 /** Spork enforcement enabled time */
 int64_t enforceMasternodePaymentsTime = 4085657524;
-int nMasternodeMinProtocol = 0;
 bool fSucessfullyLoaded = false;
 bool fEnableDarksend = false;
 /** All denominations used by darksend */
@@ -305,6 +304,13 @@ bool LogAcceptCategory(const char* category)
             const vector<string>& categories = mapMultiArgs["-debug"];
             ptrCategory.reset(new set<string>(categories.begin(), categories.end()));
             // thread_specific_ptr automatically deletes the set when the thread ends.
+            // "monkey" is a composite category enabling all monkey-related debug output
+            if (ptrCategory->count(string("monkey"))) {
+                ptrCategory->insert(string("darksend"));
+                ptrCategory->insert(string("instantx"));
+                ptrCategory->insert(string("masternode"));
+                ptrCategory->insert(string("mnpayments"));
+            }
         }
         const set<string>& setCategories = *ptrCategory.get();
 
@@ -476,6 +482,11 @@ const signed char p_util_hexdigit[256] =
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
   -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, };
+
+signed char HexDigit(char c)
+{
+    return p_util_hexdigit[(unsigned char)c];
+}
 
 bool IsHex(const string& str)
 {
@@ -1438,31 +1449,6 @@ void seed_insecure_rand(bool fDeterministic)
     }
 }
 
-string FormatVersion(int nVersion)
-{
-    if (nVersion%100 == 0)
-        return strprintf("%d.%d.%d", nVersion/1000000, (nVersion/10000)%100, (nVersion/100)%100);
-    else
-        return strprintf("%d.%d.%d.%d", nVersion/1000000, (nVersion/10000)%100, (nVersion/100)%100, nVersion%100);
-}
-
-string FormatFullVersion()
-{
-    return CLIENT_BUILD;
-}
-
-// Format the subversion field according to BIP 14 spec (https://en.bitcoin.it/wiki/BIP_0014)
-std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments)
-{
-    std::ostringstream ss;
-    ss << "/";
-    ss << name << ":" << FormatVersion(nClientVersion);
-    if (!comments.empty())
-        ss << "(" << boost::algorithm::join(comments, "; ") << ")";
-    ss << "/";
-    return ss.str();
-}
-
 #ifdef WIN32
 boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate)
 {
@@ -1590,4 +1576,19 @@ long hex2long(const char* hexString)
     }
 
     return ret;
+}
+
+std::string DurationToDHMS(int64_t nDurationTime)
+{
+    int seconds = nDurationTime % 60;
+    nDurationTime /= 60;
+    int minutes = nDurationTime % 60;
+    nDurationTime /= 60;
+    int hours = nDurationTime % 24;
+    int days = nDurationTime / 24;
+    if (days)
+        return strprintf("%dd %02dh:%02dm:%02ds", days, hours, minutes, seconds);
+    if (hours)
+        return strprintf("%02dh:%02dm:%02ds", hours, minutes, seconds);
+    return strprintf("%02dm:%02ds", minutes, seconds);
 }

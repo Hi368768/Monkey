@@ -30,8 +30,7 @@ class CClientUIInterface
 {
 public:
     /** Flags for CClientUIInterface::ThreadSafeMessageBox */
-    enum MessageBoxFlags
-    {
+    enum MessageBoxFlags {
         ICON_INFORMATION    = 0,
         ICON_WARNING        = (1U << 0),
         ICON_ERROR          = (1U << 1),
@@ -64,6 +63,9 @@ public:
         /** Force blocking, modal message box dialog (not just OS notification) */
         MODAL               = 0x10000000U,
 
+        /** Do not print contents of message to debug log */
+        SECURE = 0x40000000U,
+
         /** Predefined combinations for certain default usage cases */
         MSG_INFORMATION = (ICON_INFORMATION | BTN_OK),
         MSG_WARNING = (ICON_WARNING | BTN_OK | MODAL),
@@ -75,9 +77,6 @@ public:
 
     /** Ask the user whether they want to pay a fee or not. */
     boost::signals2::signal<bool (int64_t nFeeRequired, const std::string& strCaption), boost::signals2::last_value<bool> > ThreadSafeAskFee;
-
-    /** Handle a URL passed at the command line. */
-    boost::signals2::signal<void (const std::string& strURI)> ThreadSafeHandleURI;
 
     /** Progress message during initialization. */
     boost::signals2::signal<void (const std::string &message)> InitMessage;
@@ -93,6 +92,9 @@ public:
      * @note called with lock cs_mapAlerts held.
      */
     boost::signals2::signal<void (const uint256 &hash, ChangeType status)> NotifyAlertChanged;
+
+    /** A wallet has been loaded. */
+    boost::signals2::signal<void(CWallet* wallet)> LoadWallet;
 
     /** Show progress e.g. for verifychain */
     boost::signals2::signal<void (const std::string &title, int nProgress)> ShowProgress;

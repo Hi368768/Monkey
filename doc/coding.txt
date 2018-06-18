@@ -5,8 +5,7 @@ Block style:
 bool Function(char* psz, int n)
 {
     // Comment summarising what this section of code does
-    for (int i = 0; i < n; i++)
-    {
+    for (int i = 0; i < n; i++) {
         // When something fails, return early
         if (!Something())
             return false;
@@ -17,7 +16,7 @@ bool Function(char* psz, int n)
     return true;
 }
 
-- ANSI/Allman block style
+- K&R block style
 - 4 space indenting, no tabs
 - No extra spaces inside parenthesis; please don't do ( this )
 - No space after function names, one space after if, for and while

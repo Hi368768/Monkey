@@ -13,11 +13,9 @@
 #include "script.h"
 #include "crypto/scrypt.h"
 #include "hashblock.h"
+#include <masternode-sync.h>
 
 #include <list>
-
-#define INSTANTX_SIGNATURES_REQUIRED           10
-#define INSTANTX_SIGNATURES_TOTAL              15
 
 class CValidationState;
 class CBlock;
@@ -93,6 +91,16 @@ static const int64_t COIN_YEAR_REWARD = 0 * CENT; // 0% per year
 static const int64_t MAX_MINT_PROOF_OF_STAKE = 0 * COIN;
 static const int MODIFIER_INTERVAL_SWITCH = 1;
 
+/** "reject" message codes */
+static const unsigned char REJECT_MALFORMED = 0x01;
+static const unsigned char REJECT_INVALID = 0x10;
+static const unsigned char REJECT_OBSOLETE = 0x11;
+static const unsigned char REJECT_DUPLICATE = 0x12;
+static const unsigned char REJECT_NONSTANDARD = 0x40;
+static const unsigned char REJECT_DUST = 0x41;
+static const unsigned char REJECT_INSUFFICIENTFEE = 0x42;
+static const unsigned char REJECT_CHECKPOINT = 0x43;
+
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
@@ -107,7 +115,6 @@ static const int fHaveUPnP = false;
 
 inline int64_t PastDrift(int64_t nTime) { return nTime - 10 * 60; } // up to 10 minutes from the past
 
-inline int64_t MasternodeCollateral(int nHeight) { return 1500; } // 1500 MONK required as collateral
 /** Coinbase transaction outputs can only be spent after this number of new blocks (network rule) */
 static const int nCoinbaseMaturity = 10; // 10-TXs | 90-Mined
 /** Time to elapse before new modifier is computed */
@@ -152,6 +159,8 @@ class CTxIndex;
 class CWalletInterface;
 struct CNodeStateStats;
 
+bool Reorganize(CTxDB& txdb, CBlockIndex* pindexNew);
+
 /** Register a wallet to receive updates from core */
 void RegisterWallet(CWalletInterface* pwalletIn);
 /** Unregister a wallet from core */
@@ -170,13 +179,28 @@ void UnregisterNodeSignals(CNodeSignals& nodeSignals);
 
 void PushGetBlocks(CNode* pnode, CBlockIndex* pindexBegin, uint256 hashEnd);
 
-bool ProcessBlock(CNode* pfrom, CBlock* pblock);
+/**
+ * Process an incoming block. This only returns after the best known valid
+ * block is made active. Note that it does not, however, guarantee that the
+ * specific block passed to it has been checked for validity!
+ *
+ * @param[in]   pfrom   The node which we are receiving the block from; it is added to mapBlockSource and may be penalised if the block is invalid.
+ * @param[in]   pblock  The block we want to process.
+ * @return True if state.IsValid()
+ */
+bool ProcessNewBlock(CNode* pfrom, CBlock* pblock);
 bool CheckDiskSpace(uint64_t nAdditionalBytes=0);
 FILE* OpenBlockFile(unsigned int nFile, unsigned int nBlockPos, const char* pszMode="rb");
 FILE* AppendBlockFile(unsigned int& nFileRet);
+/** Load the block tree and coins database from disk */
 bool LoadBlockIndex(bool fAllowNew=true);
+/** Unload database information */
+void UnloadBlockIndex();
 void PrintBlockTree();
 CBlockIndex* FindBlockByHeight(int nHeight);
+/** See whether the protocol update is enforced for connected nodes */
+int ActiveProtocol();
+/** Process protocol messages received from a given node */
 bool ProcessMessages(CNode* pfrom);
 bool SendMessages(CNode* pto, bool fSendTrickle);
 void ThreadImport(std::vector<boost::filesystem::path> vImportFiles);
@@ -186,7 +210,7 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
 int64_t GetProofOfWorkReward(int nHeight, int64_t nFees);
 int64_t GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees);
 bool IsInitialBlockDownload();
-bool IsConfirmedInNPrevBlocks(const CTxIndex& txindex, const CBlockIndex* pindexFrom, int& nActualDepth);
+bool IsConfirmedInNPrevBlocks(const CTxIndex& txindex, const CBlockIndex* pindexFrom, int nMaxDepth, int& nActualDepth);
 std::string GetWarnings(std::string strFor);
 bool GetTransaction(const uint256 &hash, CTransaction &tx, uint256 &hashBlock);
 uint256 WantedByOrphan(const COrphanBlock* pblockOrphan);
@@ -215,7 +239,7 @@ bool GetNodeStateStats(NodeId nodeid, CNodeStateStats &stats);
 void Misbehaving(NodeId nodeid, int howmuch);
 
 
-int64_t GetMasternodePayment(int nHeight, int64_t blockValue);
+int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount = 0);
 
 struct CNodeStateStats {
     int nMisbehavior;
@@ -578,8 +602,14 @@ public:
     //  0  : in memory pool, waiting to be included in a block
     // >=1 : this many blocks deep in the main chain
     int GetDepthInMainChain(CBlockIndex* &pindexRet, bool enableIX=true) const;
-    int GetDepthInMainChain(bool enableIX=true) const { CBlockIndex *pindexRet; return GetDepthInMainChain(pindexRet, enableIX); }
-    bool IsInMainChain() const { CBlockIndex *pindexRet; return GetDepthInMainChainINTERNAL(pindexRet) > 0; }
+    int GetDepthInMainChain(bool enableIX=true) const {
+        CBlockIndex *pindexRet;
+        return GetDepthInMainChain(pindexRet, enableIX);
+    }
+    bool IsInMainChain() const {
+        CBlockIndex *pindexRet;
+        return GetDepthInMainChainINTERNAL(pindexRet) > 0;
+    }
     int GetBlocksToMaturity() const;
     bool AcceptToMemoryPool(bool fLimitFree=true, bool fRejectInsaneFee=true, bool ignoreFees=false);
     int GetTransactionLockSignatures() const;
@@ -974,8 +1004,13 @@ struct CDiskBlockPos
 class CBlockIndex
 {
 public:
+    //! pointer to the hash of the block, if any. memory is owned by this CBlockIndex
     const uint256* phashBlock;
+
+    //! pointer to the index of the predecessor of this block
     CBlockIndex* pprev;
+
+    //! pointer to the index of the next block
     CBlockIndex* pnext;
     unsigned int nFile;
     unsigned int nBlockPos;
@@ -1109,11 +1144,6 @@ public:
         return (pnext || this == pindexBest);
     }
 
-    bool CheckIndex() const
-    {
-        return true;
-    }
-
     int64_t GetPastTimeLimit() const
     {
         // return GetBlockTime() - nDrift;
@@ -1205,9 +1235,9 @@ public:
 
     CDiskBlockIndex()
     {
-        hashPrev = 0;
-        hashNext = 0;
-        blockHash = 0;
+        hashPrev = 0; // TODO: uint256()
+        hashNext = 0; // TODO: uint256()
+        blockHash = 0; // TODO: uint256()
     }
 
     explicit CDiskBlockIndex(CBlockIndex* pindex) : CBlockIndex(*pindex)
@@ -1481,7 +1511,14 @@ public:
     std::string GetRejectReason() const { return strRejectReason; }
 };
 
-
+/** RAII wrapper for VerifyDB: Verify consistency of the block and coin databases */
+class CVerifyDB
+{
+public:
+    CVerifyDB();
+    ~CVerifyDB();
+    bool VerifyDB(int nCheckLevel, int nCheckDepth);
+};
 
 
 
@@ -1490,7 +1527,7 @@ public:
 class CWalletInterface {
 protected:
     virtual void SyncTransaction(const CTransaction &tx, const CBlock *pblock, bool fConnect) =0;
-    virtual void EraseFromWallet(const uint256 &hash) =0;
+    // virtual void EraseFromWallet(const uint256 &hash) =0;
     virtual void SetBestChain(const CBlockLocator &locator) =0;
     virtual bool UpdatedTransaction(const uint256 &hash) =0;
     virtual void Inventory(const uint256 &hash) =0;
@@ -1503,7 +1540,7 @@ protected:
 #endif
 /** Open a block file (blk?????.dat) */
 FILE* OpenBlockFile(const CDiskBlockPos &pos, bool fReadOnly);
-/** Open an undo file (rev?????.dat) */
-FILE* OpenUndoFile(const CDiskBlockPos &pos, bool fReadOnly);
 /** Translation to a filesystem path */
 boost::filesystem::path GetBlockPosFilename(const CDiskBlockPos &pos, const char *prefix);
+/** Import blocks from an external file */
+bool LoadExternalBlockFile(FILE* fileIn, CDiskBlockPos* dbp);

@@ -43,6 +43,7 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
 #endif
 
     /* Display elements init */
+
     QDir translations(":translations");
     ui->lang->addItem(QString("(") + tr("default") + QString(")"), QVariant(""));
     foreach(const QString &langStr, translations.entryList())
@@ -73,6 +74,13 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     }
 
     ui->unit->setModel(new BitcoinUnits(this));
+
+    /* Number of displayed decimal digits selector */
+    QString digits;
+    for (int index = 2; index <= 8; index++) {
+        digits.setNum(index);
+        ui->digits->addItem(digits, digits);
+    }
 
     /* Widget-to-option mapper */
     mapper = new MonitoredDataMapper(this);
@@ -108,8 +116,11 @@ void OptionsDialog::setModel(OptionsModel *model)
     /* update the display unit, to not use the default ("BTC") */
     updateDisplayUnit();
 
-    /* warn only when language selection changes by user action (placed here so init via mapper doesn't trigger this) */
+    /* warn when one of the following settings changes by user action (placed here so init via mapper doesn't trigger them) */
+
+    /* Display */
     connect(ui->lang, SIGNAL(valueChanged()), this, SLOT(showRestartWarning_Lang()));
+    connect(ui->digits, SIGNAL(valueChanged()), this, SLOT(showRestartWarning_Lang()));
 
     /* disable ok button after settings are loaded as there is nothing to save */
     disableOkButton();
@@ -141,6 +152,7 @@ void OptionsDialog::setMapper()
     /* Display */
     mapper->addMapping(ui->lang, OptionsModel::Language);
     mapper->addMapping(ui->unit, OptionsModel::DisplayUnit);
+    mapper->addMapping(ui->digits, OptionsModel::Digits);
     mapper->addMapping(ui->coinControlFeatures, OptionsModel::CoinControlFeatures);
 
 }

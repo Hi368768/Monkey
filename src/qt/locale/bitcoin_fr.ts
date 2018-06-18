@@ -3171,11 +3171,6 @@ par exemple: alertnotify=echo %%s | mail -s &quot;Alerte monkey&quot; admin@foo.
         <translation>Chargement des adresses…</translation>
     </message>
     <message>
-        <location line="-15"/>
-        <source>Error loading blkindex.dat</source>
-        <translation>Erreur de chargement du fichier blkindex.dat</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Error loading wallet.dat: Wallet corrupted</source>
         <translation>Erreur lors du chargement de wallet.dat: portefeuille corrompu</translation>

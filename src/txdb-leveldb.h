@@ -199,9 +199,12 @@ public:
     bool WriteHashBestChain(uint256 hashBestChain);
     bool ReadBestInvalidTrust(CBigNum& bnBestInvalidTrust);
     bool WriteBestInvalidTrust(CBigNum bnBestInvalidTrust);
-    bool LoadBlockIndex();
-private:
     bool LoadBlockIndexGuts();
+    bool WriteReindexing(bool fReindex);
+    bool ReadReindexing(bool& fReindex);
+
+    bool WriteFlag(const std::string& name, bool fValue);
+    bool ReadFlag(const std::string& name, bool& fValue);
 };
 
 

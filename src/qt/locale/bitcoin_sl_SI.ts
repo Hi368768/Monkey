@@ -3164,11 +3164,6 @@ na primer: alertnotify=echo %%s | mail -s &quot;monkey Alarm&quot; admin@foo.com
         <translation>Nalaganje naslovov ...</translation>
     </message>
     <message>
-        <location line="-15"/>
-        <source>Error loading blkindex.dat</source>
-        <translation>Napaka pri nalaganju blkindex.dat</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Error loading wallet.dat: Wallet corrupted</source>
         <translation>Napaka pri nalaganju wallet.dat: denarnica pokvarjena</translation>

@@ -3170,11 +3170,6 @@ bijvoorbeeld: alertnotify = echo %%s | mail -s &quot;monkey Alert&quot; admin@fo
         <translation>Adressen aan het laden...</translation>
     </message>
     <message>
-        <location line="-15"/>
-        <source>Error loading blkindex.dat</source>
-        <translation>Fout bij laden van blkindex.dat</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Error loading wallet.dat: Wallet corrupted</source>
         <translation>Fout bij laden wallet.dat: Portemonnee corrupt</translation>

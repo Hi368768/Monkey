@@ -1,7 +1,8 @@
-
-// Copyright (c) 2009-2012 The Darkcoin developers
+// Copyright (c) 2009-2012 The Dash developers
+// Copyright (c) 2018 The Monkey developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #ifndef INSTANTX_H
 #define INSTANTX_H
 
@@ -14,6 +15,18 @@
 #include "script.h"
 #include "base58.h"
 #include "main.h"
+
+/*
+    At 15 signatures, 1/2 of the masternode network can be owned by
+    one party without comprimising the security of InstantX
+    (1000/2150.0)**10 = 0.00047382219560689856
+    (1000/2900.0)**10 = 2.3769498616783657e-05
+
+    ### getting 5 of 10 signatures w/ 1000 nodes of 2900
+    (1000/2900.0)**5 = 0.004875397277841433
+*/
+#define INSTANTX_SIGNATURES_REQUIRED 6
+#define INSTANTX_SIGNATURES_TOTAL 10
 
 using namespace std;
 using namespace boost;
@@ -28,7 +41,6 @@ extern map<uint256, CConsensusVote> mapTxLockVote;
 extern map<uint256, CTransactionLock> mapTxLocks;
 extern std::map<COutPoint, uint256> mapLockedInputs;
 extern int nCompleteTXLocks;
-
 
 int64_t CreateNewLock(CTransaction tx);
 
@@ -63,13 +75,17 @@ public:
     bool SignatureValid();
     bool Sign();
 
-    IMPLEMENT_SERIALIZE
-    (
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    {
+        unsigned int nSerSize = 0;
         READWRITE(txHash);
         READWRITE(vinMasternode);
         READWRITE(vchMasterNodeSignature);
         READWRITE(nBlockHeight);
-    )
+    }
 };
 
 class CTransactionLock

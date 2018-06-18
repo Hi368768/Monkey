@@ -1,8 +1,8 @@
 #include "addeditmasternode.h"
 #include "ui_addeditmasternode.h"
 #include "masternodeconfig.h"
-#include "masternodemanager.h"
-#include "ui_masternodemanager.h"
+#include "masternodelist.h"
+#include "ui_masternodelist.h"
 
 #include "walletdb.h"
 #include "wallet.h"

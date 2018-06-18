@@ -8,6 +8,7 @@
 
 class TransactionTableModel;
 class ClientModel;
+class NetworkStyle;
 class WalletModel;
 class TransactionView;
 class OverviewPage;
@@ -16,7 +17,8 @@ class SendCoinsDialog;
 class SignVerifyMessageDialog;
 class Notificator;
 class RPCConsole;
-class MasternodeManager;
+class MasternodeList;
+class SendCoinsRecipient;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -36,7 +38,7 @@ class BitcoinGUI : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit BitcoinGUI(QWidget *parent = 0);
+    explicit BitcoinGUI(const NetworkStyle* networkStyle, QWidget *parent = 0);
     ~BitcoinGUI();
 
     /** Set the client model.
@@ -56,54 +58,60 @@ protected:
     void dropEvent(QDropEvent *event);
 
 private:
-    ClientModel *clientModel;
-    WalletModel *walletModel;
+    ClientModel* clientModel;
+    WalletModel* walletModel;
 
-    QToolBar *toolbar;
+    QToolBar* toolbar;
 
-    QStackedWidget *centralStackedWidget;
+    QStackedWidget* centralStackedWidget;
 
-    QWidget *overviewWidget;
-    QScrollArea *overviewScroll;
-    OverviewPage *overviewPage;
-    QWidget *transactionsPage;
-    AddressBookPage *addressBookPage;
-    AddressBookPage *receiveCoinsPage;
-    SendCoinsDialog *sendCoinsPage;
-    SignVerifyMessageDialog *signVerifyMessageDialog;
-    MasternodeManager *masternodeManagerPage;
+    QWidget* overviewWidget;
+    QScrollArea* overviewScroll;
+    OverviewPage* overviewPage;
+    QWidget* transactionsPage;
+    AddressBookPage* addressBookPage;
+    AddressBookPage* receiveCoinsPage;
+    SendCoinsDialog* sendCoinsPage;
+    SignVerifyMessageDialog* signVerifyMessageDialog;
+    MasternodeList* masternodePage;
     QLabel* netLabel;
-    QLabel *labelEncryptionIcon;
-    QLabel *labelStakingIcon;
-    QLabel *labelConnectionsIcon;
-    QLabel *labelBlocksIcon;
-    QLabel *progressBarLabel;
-    QProgressBar *progressBar;
-    QProgressDialog *progressDialog;
+    QLabel* labelEncryptionIcon;
+    QLabel* labelStakingIcon;
+    QLabel* labelConnectionsIcon;
+    QLabel* labelBlocksIcon;
+    QLabel* progressBarLabel;
+    QProgressBar* progressBar;
+    QProgressDialog* progressDialog;
 
-    QMenuBar *appMenuBar;
-    QAction *overviewAction;
-    QAction *historyAction;
-    QAction *quitAction;
-    QAction *sendCoinsAction;
-    QAction *addressBookAction;
-    QAction *signMessageAction;
-    QAction *verifyMessageAction;
-    QAction *aboutAction;
-    QAction *receiveCoinsAction;
-    QAction *optionsAction;
-    QAction *toggleHideAction;
-    QAction *exportAction;
-    QAction *encryptWalletAction;
-    QAction *backupWalletAction;
-    QAction *changePassphraseAction;
-    QAction *unlockWalletAction;
-    QAction *lockWalletAction;
-    QAction *aboutQtAction;
-    QAction *openRPCConsoleAction;
-    QAction *masternodeManagerAction;
-    QAction *blockAction;
-    QAction *showBackupsAction;
+    QMenuBar* appMenuBar;
+    QAction* overviewAction;
+    QAction* historyAction;
+    QAction* masternodeAction;
+    QAction* quitAction;
+    QAction* sendCoinsAction;
+    QAction* signMessageAction;
+    QAction* verifyMessageAction;
+    QAction* aboutAction;
+    QAction* receiveCoinsAction;
+    QAction* optionsAction;
+    QAction* toggleHideAction;
+    QAction* encryptWalletAction;
+    QAction* backupWalletAction;
+    QAction* changePassphraseAction;
+    QAction* unlockWalletAction;
+    QAction* lockWalletAction;
+    QAction* aboutQtAction;
+    QAction* openInfoAction;
+    QAction* openRPCConsoleAction;
+    QAction* openNetworkAction;
+    QAction* openPeersAction;
+    QAction* openRepairAction;
+    QAction* openConfEditorAction;
+    QAction* openMNConfEditorAction;
+    QAction* showBackupsAction;
+
+    QAction* addressBookAction;
+    QAction* exportAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -127,13 +135,26 @@ private:
     /** Create system tray (notification) icon */
     void createTrayIcon();
 
+    /** Connect core signals to GUI client */
+    void subscribeToCoreSignals();
+    /** Disconnect core signals from GUI client */
+    void unsubscribeFromCoreSignals();
+
     void clearWidgets();
+
+signals:
+    /** Signal raised when a URI was entered or dragged to the GUI */
+    void receivedURI(const QString& uri);
+    /** Restart handling */
+    void requestedRestart(QStringList args);
 
 public slots:
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
     /** Set number of blocks shown in the UI */
     void setNumBlocks(int count);
+    /** Get restart command-line parameters and request restart */
+    void handleRestart(QStringList args);
     /** Set the encryption status as shown in the UI.
        @param[in] status            current encryption status
        @see WalletModel::EncryptionStatus
@@ -142,14 +163,16 @@ public slots:
 
     /** Notify the user of an error in the network or transaction handling code. */
     void error(const QString &title, const QString &message, bool modal);
+
     /** Notify the user of an event from the core network or transaction handling code.
        @param[in] title     the message box / notification title
        @param[in] message   the displayed text
-       @param[in] modal     true to use a message box, false to use a notification
-       @param[in] style     style definitions (icon and used buttons - buttons only for message boxes)
+       @param[in] style     modality and style definitions (icon and used buttons - buttons only for message boxes)
                             @see CClientUIInterface::MessageBoxFlags
+       @param[in] ret       pointer to a bool that will be modified to whether Ok was clicked (modal only)
     */
-    void message(const QString &title, const QString &message, bool modal, unsigned int style);
+    void message(const QString& title, const QString& message, unsigned int style, bool* ret = NULL);
+
     /** Asks the user whether to pay the transaction fee or to cancel the transaction.
        It is currently not possible to pass a return value to another thread through
        BlockingQueuedConnection, so an indirected pointer is used.
@@ -159,7 +182,7 @@ public slots:
       @param[out] payFee            true to pay the fee, false to not pay the fee
     */
     void askFee(qint64 nFeeRequired, bool *payFee);
-    void handleURI(QString strURI);
+    bool handlePaymentRequest(const SendCoinsRecipient& recipient);
 
 private slots:
     /** Switch to overview (home) page */
@@ -172,8 +195,8 @@ private slots:
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage();
-    /** Switch to masternode manager page*/
-    void gotoMasternodeManagerPage();
+    /** Switch to masternode page*/
+    void gotoMasternodePage();
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
     /** Show Sign/Verify Message dialog and switch to verify message tab */

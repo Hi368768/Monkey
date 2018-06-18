@@ -1,6 +1,8 @@
 #ifndef COINCONTROLDIALOG_H
 #define COINCONTROLDIALOG_H
 
+#include "util.h"
+
 #include <QAbstractButton>
 #include <QAction>
 #include <QDialog>
@@ -22,29 +24,31 @@ class CoinControlDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit CoinControlDialog(QWidget *parent = 0);
+    explicit CoinControlDialog(QWidget* parent = nullptr);
     ~CoinControlDialog();
 
-    void setModel(WalletModel *model);
+    void setModel(WalletModel* model);
+    void updateDialogLabels();
 
     // static because also called from sendcoinsdialog
     static void updateLabels(WalletModel*, QDialog*);
     static QString getPriorityLabel(double);
 
-    static QList<qint64> payAmounts;
-    static CCoinControl *coinControl;
+    static QList<CAmount> payAmounts;
+    static CCoinControl* coinControl;
+    static int nSplitBlockDummy;
 
 private:
-    Ui::CoinControlDialog *ui;
-    WalletModel *model;
+    Ui::CoinControlDialog* ui;
+    WalletModel* model;
     int sortColumn;
     Qt::SortOrder sortOrder;
 
-    QMenu *contextMenu;
-    QTreeWidgetItem *contextMenuItem;
-    QAction *copyTransactionHashAction;
-    QAction *lockAction;
-    QAction *unlockAction;
+    QMenu* contextMenu;
+    QTreeWidgetItem* contextMenuItem;
+    QAction* copyTransactionHashAction;
+    QAction* lockAction;
+    QAction* unlockAction;
 
     QString strPad(QString, int, QString);
     void sortView(int, Qt::SortOrder);
@@ -90,7 +94,7 @@ private:
     }
 
 private slots:
-    void showMenu(const QPoint &);
+    void showMenu(const QPoint&);
     void copyAmount();
     void copyLabel();
     void copyAddress();
@@ -111,7 +115,7 @@ private slots:
     void headerSectionClicked(int);
     void buttonBoxClicked(QAbstractButton*);
     void buttonSelectAllClicked();
-	void customSelectCoins();
+    void customSelectCoins();
     void updateLabelLocked();
 };
 

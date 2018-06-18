@@ -80,6 +80,38 @@ string AccountFromValue(const Value& value)
     return strAccount;
 }
 
+void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew, bool fUseIX = false)
+{
+    // Check amount
+    if (nValue <= 0)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid amount");
+
+    if (nValue > pwalletMain->GetBalance())
+        throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Insufficient funds");
+
+    string strError;
+    if (pwalletMain->IsLocked()) {
+        strError = "Error: Wallet locked, unable to create transaction!";
+        LogPrintf("SendMoney() : %s", strError);
+        throw JSONRPCError(RPC_WALLET_ERROR, strError);
+    }
+
+    // Parse Monkey address
+    CScript scriptPubKey = GetScriptForDestination(address);
+
+    // Create and send the transaction
+    CReserveKey reservekey(pwalletMain);
+    CAmount nFeeRequired;
+    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, NULL, ALL_COINS, fUseIX)) {
+        if (nValue + nFeeRequired > pwalletMain->GetBalance())
+            strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
+        LogPrintf("SendMoney() : %s\n", strError);
+        throw JSONRPCError(RPC_WALLET_ERROR, strError);
+    }
+    if (!pwalletMain->CommitTransaction(wtxNew, reservekey, (!fUseIX ? "tx" : "ix")))
+        throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
+}
+
 //
 // Used by addmultisigaddress / createmultisig:
 //
@@ -432,13 +464,10 @@ Value sendtoaddress(const Array& params, bool fHelp)
             "                             transaction, just kept in your wallet.\n"
             "\nResult:\n"
             "\"transactionid\"  (string) The transaction id.\n"
-            "\nExamples:\n"
-            + HelpExampleCli("sendtoaddress", "\"TfFxcTN7BJQp88cPJYRvFpUAAKefTib9uh\" 0.1")
-            + HelpExampleCli("sendtoaddress", "\"TfFxcTN7BJQp88cPJYRvFpUAAKefTib9uh\" 0.1 \"donation\" \"seans outpost\"")
-            + HelpExampleRpc("sendtoaddress", "\"TfFxcTN7BJQp88cPJYRvFpUAAKefTib9uh\", 0.1, \"donation\", \"seans outpost\"")
+            "\nExamples:\n" +
+            HelpExampleCli("sendtoaddress", "\"TfFxcTN7BJQp88cPJYRvFpUAAKefTib9uh\" 0.1") +
+            HelpExampleCli("sendtoaddress", "\"TfFxcTN7BJQp88cPJYRvFpUAAKefTib9uh\" 0.1 \"donation\"")
         );
-
-    EnsureWalletIsUnlocked();
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
@@ -447,23 +476,16 @@ Value sendtoaddress(const Array& params, bool fHelp)
     // Amount
     CAmount nAmount = AmountFromValue(params[1]);
 
-    CWalletTx wtx;
-    std::string sNarr;
-
     // Wallet comments
+    CWalletTx wtx;
     if (params.size() > 2 && params[2].type() != null_type && !params[2].get_str().empty())
         wtx.mapValue["comment"] = params[2].get_str();
     if (params.size() > 3 && params[3].type() != null_type && !params[3].get_str().empty())
         wtx.mapValue["to"]      = params[3].get_str();
-    if (params.size() > 4 && params[4].type() != null_type && !params[4].get_str().empty())
-        sNarr = params[4].get_str();
-    if (sNarr.length() > 24)
-        throw std::runtime_error("Narration must be 24 characters or less.");
 
-    std::string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, sNarr, wtx);
+    EnsureWalletIsUnlocked();
 
-    if (strError != "")
-        throw JSONRPCError(RPC_WALLET_ERROR, strError);
+    SendMoney(address.Get(), nAmount, wtx);
 
     return wtx.GetHash().GetHex();
 }
@@ -865,15 +887,15 @@ Value movecmd(const Array& params, bool fHelp)
 
 Value sendfrom(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() < 3 || params.size() > 7)
+    if (fHelp || params.size() < 3 || params.size() > 6)
         throw runtime_error(
-            "sendfrom \"fromaccount\" \"tomonkeyaddress\" amount ( minconf \"comment\" \"comment-to\" )\n"
+            "sendfrom \"fromaccount\" \"toMONKaddress\" amount ( minconf \"comment\" \"comment-to\" )\n"
             "\nSent an amount from an account to a Monkey address.\n"
             "The amount is a real and is rounded to the nearest 0.00000001."
             + HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
             "1. \"fromaccount\"       (string, required) The name of the account to send funds from. May be the default account using \"\".\n"
-            "2. \"tomonkeyaddress\"  (string, required) The Monkey address to send funds to.\n"
+            "2. \"toMONKaddress\"     (string, required) The Monkey address to send funds to.\n"
             "3. amount                (numeric, required) The amount in TX. (transaction fee is added on top).\n"
             "4. minconf               (numeric, optional, default=1) Only use funds with at least this many confirmations.\n"
             "5. \"comment\"           (string, optional) A comment used to store what the transaction is for. \n"
@@ -892,8 +914,6 @@ Value sendfrom(const Array& params, bool fHelp)
             + HelpExampleRpc("sendfrom", "\"tabby\", \"TfFxcTN7BJQp88cPJYRvFpUAAKefTib9uh\", 0.01, 10, \"donation\", \"seans outpost\"")
         );
 
-    EnsureWalletIsUnlocked();
-
     string strAccount = AccountFromValue(params[0]);
     CBitcoinAddress address(params[1].get_str());
     if (!address.IsValid())
@@ -906,18 +926,12 @@ Value sendfrom(const Array& params, bool fHelp)
 
     CWalletTx wtx;
     wtx.strFromAccount = strAccount;
-
     if (params.size() > 4 && params[4].type() != null_type && !params[4].get_str().empty())
         wtx.mapValue["comment"] = params[4].get_str();
     if (params.size() > 5 && params[5].type() != null_type && !params[5].get_str().empty())
         wtx.mapValue["to"]      = params[5].get_str();
 
-    std::string sNarr;
-    if (params.size() > 6 && params[6].type() != null_type && !params[6].get_str().empty())
-        sNarr = params[6].get_str();
-
-    if (sNarr.length() > 24)
-        throw runtime_error("Narration must be 24 characters or less.");
+    EnsureWalletIsUnlocked();
 
     // Check funds
     int64_t nBalance = GetAccountBalance(strAccount, nMinDepth, ISMINE_SPENDABLE);
@@ -925,13 +939,10 @@ Value sendfrom(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Account has insufficient funds");
 
     // Send
-    string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, sNarr, wtx);
-    if (strError != "")
-        throw JSONRPCError(RPC_WALLET_ERROR, strError);
+    SendMoney(address.Get(), nAmount, wtx);
 
     return wtx.GetHash().GetHex();
 }
-
 
 Value sendmany(const Array& params, bool fHelp)
 {
@@ -1006,7 +1017,7 @@ Value sendmany(const Array& params, bool fHelp)
     CReserveKey keyChange(pwalletMain);
     int64_t nFeeRequired = 0;
     std::string strFailReason;
-    bool fCreated = pwalletMain->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, 1, strFailReason);
+    bool fCreated = pwalletMain->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, strFailReason);
     if (!fCreated)
     {
         if (totalAmount + nFeeRequired > pwalletMain->GetBalance())
@@ -1872,8 +1883,6 @@ Value keypoolrefill(const Array& params, bool fHelp)
         );
 
     fLiteMode = GetBoolArg("-litemode", false);
-    if (!IsSporkActive(SPORK_1_ENABLE_MASTERNODE_PAYMENTS))
-        fLiteMode = true;
 
     unsigned int nSize;
 
@@ -2145,8 +2154,7 @@ Value checkwallet(const Array& params, bool fHelp)
     Object result;
     if (nMismatchSpent == 0)
         result.push_back(Pair("wallet check passed", true));
-    else
-    {
+    else {
         result.push_back(Pair("mismatched spent coins", nMismatchSpent));
         result.push_back(Pair("amount in question", ValueFromAmount(nBalanceInQuestion)));
     }
@@ -2168,8 +2176,7 @@ Value repairwallet(const Array& params, bool fHelp)
     Object result;
     if (nMismatchSpent == 0)
         result.push_back(Pair("wallet check passed", true));
-    else
-    {
+    else {
         result.push_back(Pair("mismatched spent coins", nMismatchSpent));
         result.push_back(Pair("amount affected by repair", ValueFromAmount(nBalanceInQuestion)));
     }
@@ -2281,39 +2288,38 @@ Value cclistcoins(const Array& params, bool fHelp)
     if (fHelp || params.size() != 0)
         throw runtime_error(
             "cclistcoins\n"
-                        "CoinControl: list your spendable coins and their information\n");
+            "CoinControl: list your spendable coins and their information\n");
 
-        Array result;
+    Array result;
 
-        std::vector<COutput> vCoins;
+    std::vector<COutput> vCoins;
     pwalletMain->AvailableCoins(vCoins);
 
-        BOOST_FOREACH(const COutput& out, vCoins)
-    {
-                Object coutput;
-                int64_t nHeight = nBestHeight - out.nDepth;
-                CBlockIndex* pindex = FindBlockByHeight(nHeight);
+    for (const COutput& out : vCoins) {
+        Object coutput;
+        int64_t nHeight = nBestHeight - out.nDepth;
+        CBlockIndex* pindex = FindBlockByHeight(nHeight);
 
-                CTxDestination outputAddress;
-                ExtractDestination(out.tx->vout[out.i].scriptPubKey, outputAddress);
-                coutput.push_back(Pair("Address", CBitcoinAddress(outputAddress).ToString()));
-                coutput.push_back(Pair("Output Hash", out.tx->GetHash().ToString()));
-                coutput.push_back(Pair("blockIndex", out.i));
-                double dAmount = double(out.tx->vout[out.i].nValue) / double(COIN);
-                coutput.push_back(Pair("Value", dAmount));
-                coutput.push_back(Pair("Confirmations", int(out.nDepth)));
-                double dAge = double(GetTime() - pindex->nTime);
-                coutput.push_back(Pair("Age (days)", (dAge/(60*60*24))));
-                uint64_t nWeight = 0;
-                pwalletMain->GetStakeWeightFromValue(out.tx->GetTxTime(), out.tx->vout[out.i].nValue, nWeight);
-                if(dAge < Params().StakeMinAge())
-                        nWeight = 0;
-                coutput.push_back(Pair("Weight", int(nWeight)));
-                double nReward = (double)GetProofOfStakeReward(pindexBest->nHeight, 0, 0);
-                coutput.push_back(Pair("Potential Stake", nReward));
-                result.push_back(coutput);
-        }
-        return result;
+        CTxDestination outputAddress;
+        ExtractDestination(out.tx->vout[out.i].scriptPubKey, outputAddress);
+        coutput.push_back(Pair("Address", CBitcoinAddress(outputAddress).ToString()));
+        coutput.push_back(Pair("Output Hash", out.tx->GetHash().ToString()));
+        coutput.push_back(Pair("blockIndex", out.i));
+        double dAmount = double(out.tx->vout[out.i].nValue) / double(COIN);
+        coutput.push_back(Pair("Value", dAmount));
+        coutput.push_back(Pair("Confirmations", int(out.nDepth)));
+        double dAge = double(GetTime() - pindex->nTime);
+        coutput.push_back(Pair("Age (days)", (dAge/(60*60*24))));
+        uint64_t nWeight = 0;
+        pwalletMain->GetStakeWeightFromValue(out.tx->GetTxTime(), out.tx->vout[out.i].nValue, nWeight);
+        if(dAge < Params().StakeMinAge())
+                nWeight = 0;
+        coutput.push_back(Pair("Weight", int(nWeight)));
+        double nReward = (double)GetProofOfStakeReward(pindexBest->nHeight, 0, 0);
+        coutput.push_back(Pair("Potential Stake", nReward));
+        result.push_back(coutput);
+    }
+    return result;
 }
 
 Value setstakesplitthreshold(const Array& params, bool fHelp)

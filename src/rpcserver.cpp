@@ -219,43 +219,74 @@ Value stop(const Array& params, bool fHelp)
 static const CRPCCommand vRPCCommands[] =
 { //  name                      actor (function)         okSafeMode threadSafe reqWallet
   //  ------------------------  -----------------------  ---------- ---------- ---------
+    /* Overall control/query calls */
     { "help",                   &help,                   true,      true,      false },
     { "stop",                   &stop,                   true,      true,      false },
-    { "getbestblockhash",       &getbestblockhash,       true,      false,     false },
-    { "getblockcount",          &getblockcount,          true,      false,     false },
-    { "getconnectioncount",     &getconnectioncount,     true,      false,     false },
-    { "getpeerinfo",            &getpeerinfo,            true,      false,     false },
+    { "getinfo",                &getinfo,                true,      false,     false },
+
+    /* P2P networking */
     { "addnode",                &addnode,                true,      true,      false },
     { "getaddednodeinfo",       &getaddednodeinfo,       true,      true,      false },
-    { "ping",                   &ping,                   true,      false,     false },
+    { "getconnectioncount",     &getconnectioncount,     true,      false,     false },
     { "getnettotals",           &getnettotals,           true,      true,      false },
-    { "getdifficulty",          &getdifficulty,          true,      false,     false },
-    { "getinfo",                &getinfo,                true,      false,     false },
-    { "getrawmempool",          &getrawmempool,          true,      false,     false },
+    { "getpeerinfo",            &getpeerinfo,            true,      false,     false },
+    { "ping",                   &ping,                   true,      false,     false },
+    { "sendalert",              &sendalert,              false,     false,     false },
+
+    /* Block chain and UTXO */
+    { "getbestblockhash",       &getbestblockhash,       true,      false,     false },
+    { "getblockcount",          &getblockcount,          true,      false,     false },
     { "getblock",               &getblock,               false,     false,     false },
-    { "getblockbynumber",       &getblockbynumber,       false,     false,     false },
     { "getblockhash",           &getblockhash,           false,     false,     false },
-    { "getrawtransaction",      &getrawtransaction,      false,     false,     false },
+    { "getdifficulty",          &getdifficulty,          true,      false,     false },
+    { "getrawmempool",          &getrawmempool,          true,      false,     false },
+    { "getblockbynumber",       &getblockbynumber,       false,     false,     false },
+    { "getcheckpoint",          &getcheckpoint,          true,      false,     false },
+
+    /* Mining */
+    { "getblocktemplate",       &getblocktemplate,       true,      false,     false },
+    { "getmininginfo",          &getmininginfo,          true,      false,     false },
+    { "submitblock",            &submitblock,            false,     false,     false },
+    { "reservebalance",         &reservebalance,         false,     true,      true },
+
+    /* Raw transactions */
     { "createrawtransaction",   &createrawtransaction,   false,     false,     false },
     { "decoderawtransaction",   &decoderawtransaction,   false,     false,     false },
     { "decodescript",           &decodescript,           false,     false,     false },
-    { "signrawtransaction",     &signrawtransaction,     false,     false,     false },
+    { "getrawtransaction",      &getrawtransaction,      false,     false,     false },
     { "sendrawtransaction",     &sendrawtransaction,     false,     false,     false },
-    { "getcheckpoint",          &getcheckpoint,          true,      false,     false },
-    { "sendalert",              &sendalert,              false,     false,     false },
-    { "validateaddress",        &validateaddress,        true,      false,     false },
-    { "validatepubkey",         &validatepubkey,         true,      false,     false },
-    { "verifymessage",          &verifymessage,          false,     false,     false },
+    { "signrawtransaction",     &signrawtransaction,     false,     false,     false },
     { "searchrawtransactions",  &searchrawtransactions,  false,     false,     false },
 
-/* Dark features */
-    { "spork",                  &spork,                  true,      false,      false },
-    { "masternode",             &masternode,             true,      false,      true },
-    { "masternodelist",         &masternodelist,         true,      false,      false },
+    /* Utility functions */
+    { "createmultisig",         &createmultisig,         true,      true,      false },
+    { "validateaddress",        &validateaddress,        true,      false,     false },
+    { "verifymessage",          &verifymessage,          false,     false,     false },
+    { "reorganize",             &reorganize,             false,     false,     false },
+
+    /* Monkey features */
+    { "masternode",             &masternode,             true,      false,     true },
+    { "masternodeconnect",      &masternodeconnect,      true,      true,      false },
+    { "getmasternodecount",     &getmasternodecount,     true,      true,      false },
+    { "masternodecurrent",      &masternodecurrent,      true,      true,      false },
+    { "masternodedebug",        &masternodedebug,        true,      true,      false },
+    { "createmasternodekey",    &createmasternodekey,    true,      true,      false },
+    { "getmasternodeoutputs",   &getmasternodeoutputs,   true,      true,      false },
+    { "startmasternode",        &startmasternode,        true,      true,      false },
+    { "getmasternodestatus",    &getmasternodestatus,    true,      true,      false },
+    { "listmasternodes",        &listmasternodes,        true,      true,      false },
+    { "listmasternodeconf",     &listmasternodeconf,     true,      true,      false },
+    { "getmasternodewinners",   &getmasternodewinners,   true,      true,      false },
+    { "getmasternodescores",    &getmasternodescores,    true,      true,      false },
+    { "mnsync",                 &mnsync,                 true,      true,      false },
+    { "spork",                  &spork,                  true,      false,     false },
+    { "getpoolinfo",            &getpoolinfo,            true,      true,      false },
 
 #ifdef ENABLE_WALLET
     { "darksend",               &darksend,               false,     false,      true },
-    { "getmininginfo",          &getmininginfo,          true,      false,     false },
+
+    /* Wallet */
+    { "validatepubkey",         &validatepubkey,         true,      false,     false },
     { "getstakinginfo",         &getstakinginfo,         true,      false,     false },
     { "getnewaddress",          &getnewaddress,          true,      false,     true },
     { "getnewpubkey",           &getnewpubkey,           true,      false,     true },
@@ -287,8 +318,6 @@ static const CRPCCommand vRPCCommands[] =
     { "getwork",                &getwork,                true,      false,     true },
     { "getworkex",              &getworkex,              true,      false,     true },
     { "listaccounts",           &listaccounts,           false,     false,     true },
-    { "getblocktemplate",       &getblocktemplate,       true,      false,     false },
-    { "submitblock",            &submitblock,            false,     false,     false },
     { "listsinceblock",         &listsinceblock,         false,     false,     true },
     { "dumpprivkey",            &dumpprivkey,            false,     false,     true },
     { "dumpwallet",             &dumpwallet,             true,      false,     true },
@@ -300,8 +329,6 @@ static const CRPCCommand vRPCCommands[] =
     { "settxfee",               &settxfee,               false,     false,     true },
     { "getsubsidy",             &getsubsidy,             true,      true,      false },
     { "getstakesubsidy",        &getstakesubsidy,        true,      true,      false },
-    { "reservebalance",         &reservebalance,         false,     true,      true },
-    { "createmultisig",         &createmultisig,         true,      true,      false },
     { "checkwallet",            &checkwallet,            false,     true,      true },
     { "repairwallet",           &repairwallet,           false,     true,      true },
     { "resendtx",               &resendtx,               false,     true,      true },

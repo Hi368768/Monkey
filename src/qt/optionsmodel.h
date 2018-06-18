@@ -38,6 +38,7 @@ public:
         Fee,                    // qint64
         ReserveBalance,         // qint64
         DisplayUnit,            // BitcoinUnits::Unit
+        Digits,                 // QString
         Language,               // QString
         CoinControlFeatures,    // bool
         DarksendRounds,    // int

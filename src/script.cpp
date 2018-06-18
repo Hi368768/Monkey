@@ -2506,8 +2506,7 @@ isminetype IsMine(const CKeyStore &keystore, const CScript& scriptPubKey)
     }
 
     CKeyID keyID;
-    switch (whichType)
-    {
+    switch (whichType) {
     case TX_NONSTANDARD:
     case TX_NULL_DATA:
         break;
@@ -2521,8 +2520,7 @@ isminetype IsMine(const CKeyStore &keystore, const CScript& scriptPubKey)
         if (keystore.HaveKey(keyID))
             return ISMINE_SPENDABLE;
         break;
-    case TX_SCRIPTHASH:
-    {
+    case TX_SCRIPTHASH: {
         CScriptID scriptID = CScriptID(uint160(vSolutions[0]));
         CScript subscript;
         if (keystore.GetCScript(scriptID, subscript)) {

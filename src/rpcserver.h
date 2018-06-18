@@ -3,8 +3,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef _BITCOINRPC_SERVER_H_
-#define _BITCOINRPC_SERVER_H_ 1
+#ifndef BITCOIN_RPCSERVER_H
+#define BITCOIN_RPCSERVER_H
 
 #include "uint256.h"
 #include "rpcprotocol.h"
@@ -165,8 +165,10 @@ extern json_spirit::Value checkwallet(const json_spirit::Array& params, bool fHe
 extern json_spirit::Value repairwallet(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value resendtx(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value makekeypair(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value validatepubkey(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getnewpubkey(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value setstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value cclistcoins(const json_spirit::Array& params, bool fHelp);
 
 extern json_spirit::Value getrawtransaction(const json_spirit::Array& params, bool fHelp); // in rcprawtransaction.cpp
 extern json_spirit::Value searchrawtransactions(const json_spirit::Array& params, bool fHelp);
@@ -190,14 +192,28 @@ extern json_spirit::Value getcheckpoint(const json_spirit::Array& params, bool f
 
 extern json_spirit::Value scanforalltxns(const json_spirit::Array& params, bool fHelp);
 
-extern json_spirit::Value darksend(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value spork(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value darksend(const json_spirit::Array& params, bool fHelp); // in rpcmasternode.cpp
+extern json_spirit::Value getpoolinfo(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value masternode(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value masternodelist(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value masternodeconnect(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getmasternodecount(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value masternodecurrent(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value masternodedebug(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value createmasternodekey(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getmasternodeoutputs(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value startmasternode(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getmasternodestatus(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value listmasternodes(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value listmasternodeconf(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getmasternodewinners(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getmasternodescores(const json_spirit::Array& params, bool fHelp);
 
-extern json_spirit::Value cclistcoins(const json_spirit::Array& params, bool fHelp);
-
-extern json_spirit::Value setstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getinfo(const json_spirit::Array& params, bool fHelp); // in rpcmisc.cpp
+extern json_spirit::Value mnsync(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value spork(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value validateaddress(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value verifymessage(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value validatepubkey(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value reorganize(const json_spirit::Array& params, bool fHelp);
 
 #endif
